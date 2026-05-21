@@ -313,7 +313,11 @@
                                 <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc WebSocketUrl}" />
                                 <TextBox x:Name="CustomSttUrlBox" Margin="0,0,0,12" />
                                 <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiKey}" />
-                                <PasswordBox x:Name="CustomSttApiKeyBox" />
+                                <PasswordBox x:Name="CustomSttApiKeyBox" Margin="0,0,0,12" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc AuthHeader}" />
+                                <TextBox x:Name="CustomSttAuthHeaderBox" Margin="0,0,0,12" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc TranscriptJsonPath}" />
+                                <TextBox x:Name="CustomSttTranscriptFieldBox" />
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>

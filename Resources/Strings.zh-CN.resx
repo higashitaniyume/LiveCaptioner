@@ -136,4 +136,10 @@
   <data name="MicrosoftTranslateMissingKey" xml:space="preserve"><value>未配置微软翻译 Key，显示原始识别文本</value></data>
   <data name="MinTextLength" xml:space="preserve"><value>最小文本长度（字符）</value></data>
   <data name="DebounceDelayMs" xml:space="preserve"><value>停顿等待时间（毫秒）</value></data>
+  <data name="AuthHeader" xml:space="preserve"><value>鉴权 Header</value></data>
+  <data name="TranscriptJsonPath" xml:space="preserve"><value>转录字段路径（如 payload.result）</value></data>
+  <data name="CustomSttConnected" xml:space="preserve"><value>自定义 STT 已连接：{0}</value></data>
+  <data name="CustomSttMissingUrl" xml:space="preserve"><value>未配置自定义 STT WebSocket URL</value></data>
+  <data name="CustomSttInvalidUrl" xml:space="preserve"><value>自定义 STT URL 必须以 ws:// 或 wss:// 开头</value></data>
+  <data name="CustomSttStopFailed" xml:space="preserve"><value>自定义 STT 停止失败：{0}</value></data>
 </root>

@@ -63,6 +63,8 @@ public partial class SettingsWindow : Window
         SelectCombo(AsrBackendBox, Settings.AsrBackend);
         CustomSttUrlBox.Text = Settings.CustomSttWebSocketUrl;
         CustomSttApiKeyBox.Password = Settings.CustomSttApiKey;
+        CustomSttAuthHeaderBox.Text = Settings.CustomSttAuthHeader;
+        CustomSttTranscriptFieldBox.Text = Settings.CustomSttTranscriptField;
 
         AutoTranslateBox.IsChecked = Settings.AutoTranslate;
         BilingualComparisonBox.IsChecked = Settings.BilingualComparison;
@@ -123,6 +125,8 @@ public partial class SettingsWindow : Window
         Settings.AsrBackend = ReadCombo(AsrBackendBox, "auto");
         Settings.CustomSttWebSocketUrl = CustomSttUrlBox.Text.Trim();
         Settings.CustomSttApiKey = CustomSttApiKeyBox.Password.Trim();
+        Settings.CustomSttAuthHeader = CustomSttAuthHeaderBox.Text.Trim();
+        Settings.CustomSttTranscriptField = CustomSttTranscriptFieldBox.Text.Trim();
 
         Settings.AutoTranslate = AutoTranslateBox.IsChecked == true;
         Settings.BilingualComparison = BilingualComparisonBox.IsChecked == true;

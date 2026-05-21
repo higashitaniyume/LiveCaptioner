@@ -26,6 +26,8 @@ public sealed class AppSettings
     public string GoogleSpeechLanguage { get; set; } = "en-US";
     public string CustomSttWebSocketUrl { get; set; } = string.Empty;
     public string CustomSttApiKey { get; set; } = string.Empty;
+    public string CustomSttAuthHeader { get; set; } = "Authorization";
+    public string CustomSttTranscriptField { get; set; } = string.Empty;
     public bool AutoTranslate { get; set; } = true;
     public bool BilingualComparison { get; set; } = true;
     public bool SaveHistory { get; set; } = true;

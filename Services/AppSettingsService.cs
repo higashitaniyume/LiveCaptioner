@@ -94,6 +94,10 @@ public sealed class AppSettingsService
             : settings.GoogleSpeechLanguage.Trim();
         settings.CustomSttWebSocketUrl = settings.CustomSttWebSocketUrl.Trim();
         settings.CustomSttApiKey = settings.CustomSttApiKey.Trim();
+        settings.CustomSttAuthHeader = string.IsNullOrWhiteSpace(settings.CustomSttAuthHeader)
+            ? "Authorization"
+            : settings.CustomSttAuthHeader.Trim();
+        settings.CustomSttTranscriptField = settings.CustomSttTranscriptField.Trim();
         settings.TranslationProvider = NormalizeTranslationProvider(settings.TranslationProvider);
         settings.GoogleTranslateApiKey = settings.GoogleTranslateApiKey.Trim();
         settings.MicrosoftTranslatorKey = settings.MicrosoftTranslatorKey.Trim();

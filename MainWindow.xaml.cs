@@ -400,6 +400,10 @@ public partial class MainWindow : Window
         var previousGoogleLanguage = _settings.GoogleSpeechLanguage;
         var previousWhisperModel = _settings.WhisperModel;
         var previousAsrBackend = _settings.AsrBackend;
+        var previousCustomSttUrl = _settings.CustomSttWebSocketUrl;
+        var previousCustomSttApiKey = _settings.CustomSttApiKey;
+        var previousCustomSttAuthHeader = _settings.CustomSttAuthHeader;
+        var previousCustomSttTranscriptField = _settings.CustomSttTranscriptField;
         var previousLanguage = _settings.Language;
 
         _settings = updatedSettings;
@@ -440,7 +444,11 @@ public partial class MainWindow : Window
             !string.Equals(previousAzureLanguage, _settings.AzureSpeechLanguage, StringComparison.OrdinalIgnoreCase) ||
             !string.Equals(previousGoogleCredentialsPath, _settings.GoogleCredentialsPath, StringComparison.OrdinalIgnoreCase) ||
             !string.Equals(previousGoogleLanguage, _settings.GoogleSpeechLanguage, StringComparison.OrdinalIgnoreCase) ||
-            !string.Equals(previousWhisperModel, _settings.WhisperModel, StringComparison.OrdinalIgnoreCase))
+            !string.Equals(previousWhisperModel, _settings.WhisperModel, StringComparison.OrdinalIgnoreCase) ||
+            !string.Equals(previousCustomSttUrl, _settings.CustomSttWebSocketUrl, StringComparison.OrdinalIgnoreCase) ||
+            !string.Equals(previousCustomSttApiKey, _settings.CustomSttApiKey, StringComparison.Ordinal) ||
+            !string.Equals(previousCustomSttAuthHeader, _settings.CustomSttAuthHeader, StringComparison.OrdinalIgnoreCase) ||
+            !string.Equals(previousCustomSttTranscriptField, _settings.CustomSttTranscriptField, StringComparison.OrdinalIgnoreCase))
         {
             await RestartAsrAsync();
         }
@@ -498,7 +506,11 @@ public partial class MainWindow : Window
 
         if (string.Equals(_settings.AsrProvider, "custom", StringComparison.OrdinalIgnoreCase))
         {
-            return new UnsupportedAsrService(LocalizationManager.T("CustomSttUnsupported"));
+            return new CustomStreamingAsrService(
+                _settings.CustomSttWebSocketUrl,
+                _settings.CustomSttApiKey,
+                _settings.CustomSttAuthHeader,
+                _settings.CustomSttTranscriptField);
         }
 
         var modelPath = Path.Combine(

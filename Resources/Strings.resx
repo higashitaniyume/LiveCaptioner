@@ -136,4 +136,10 @@ Strictly output JSON only. Do not use Markdown or explanations. Format:
   <data name="MicrosoftTranslateMissingKey" xml:space="preserve"><value>Microsoft Translator key is not configured; showing raw transcript</value></data>
   <data name="MinTextLength" xml:space="preserve"><value>Min text length (chars)</value></data>
   <data name="DebounceDelayMs" xml:space="preserve"><value>Pause before showing (ms)</value></data>
+  <data name="AuthHeader" xml:space="preserve"><value>Auth Header</value></data>
+  <data name="TranscriptJsonPath" xml:space="preserve"><value>Transcript JSON path (e.g. payload.result)</value></data>
+  <data name="CustomSttConnected" xml:space="preserve"><value>Custom STT connected: {0}</value></data>
+  <data name="CustomSttMissingUrl" xml:space="preserve"><value>Custom STT WebSocket URL is not configured</value></data>
+  <data name="CustomSttInvalidUrl" xml:space="preserve"><value>Custom STT URL must start with ws:// or wss://</value></data>
+  <data name="CustomSttStopFailed" xml:space="preserve"><value>Custom STT stop failed: {0}</value></data>
 </root>
