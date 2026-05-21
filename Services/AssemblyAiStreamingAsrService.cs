@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Channels;
+using LiveCaptioner.Localization;
 
 namespace LiveCaptioner.Services;
 
@@ -47,7 +48,7 @@ public sealed class AssemblyAiStreamingAsrService : IAsrService, IStreamingAudio
 
         if (string.IsNullOrWhiteSpace(_apiKey))
         {
-            StatusChanged?.Invoke(this, "未配置 AssemblyAI API Key，无法启动在线识别");
+            StatusChanged?.Invoke(this, LocalizationManager.T("AssemblyAiMissingKey"));
             return;
         }
 
@@ -66,7 +67,7 @@ public sealed class AssemblyAiStreamingAsrService : IAsrService, IStreamingAudio
         await _webSocket.ConnectAsync(uri, _cts.Token).ConfigureAwait(false);
         _sendTask = Task.Run(() => SendLoopAsync(_cts.Token));
         _receiveTask = Task.Run(() => ReceiveLoopAsync(_cts.Token));
-        StatusChanged?.Invoke(this, $"AssemblyAI 在线识别已连接：{_speechModel}");
+        StatusChanged?.Invoke(this, LocalizationManager.Format("AssemblyAiConnected", _speechModel));
     }
 
     public async Task StopAsync()
@@ -102,7 +103,7 @@ public sealed class AssemblyAiStreamingAsrService : IAsrService, IStreamingAudio
         }
         catch (Exception ex)
         {
-            StatusChanged?.Invoke(this, $"AssemblyAI 停止失败：{ex.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("AssemblyAiStopFailed", ex.Message));
         }
         finally
         {
@@ -201,7 +202,7 @@ public sealed class AssemblyAiStreamingAsrService : IAsrService, IStreamingAudio
                 result = await _webSocket.ReceiveAsync(buffer, cancellationToken).ConfigureAwait(false);
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    StatusChanged?.Invoke(this, $"AssemblyAI 连接关闭：{_webSocket.CloseStatusDescription}");
+                    StatusChanged?.Invoke(this, LocalizationManager.Format("AssemblyAiClosed", _webSocket.CloseStatusDescription));
                     return;
                 }
 
@@ -228,13 +229,13 @@ public sealed class AssemblyAiStreamingAsrService : IAsrService, IStreamingAudio
 
             if (string.Equals(message.Type, "Begin", StringComparison.OrdinalIgnoreCase))
             {
-                StatusChanged?.Invoke(this, $"AssemblyAI 会话已开始：{message.Id}");
+                StatusChanged?.Invoke(this, LocalizationManager.Format("AssemblyAiSessionStarted", message.Id));
                 return;
             }
 
             if (string.Equals(message.Type, "Termination", StringComparison.OrdinalIgnoreCase))
             {
-                StatusChanged?.Invoke(this, "AssemblyAI 会话已结束");
+                StatusChanged?.Invoke(this, LocalizationManager.T("AssemblyAiSessionEnded"));
                 return;
             }
 
@@ -251,7 +252,7 @@ public sealed class AssemblyAiStreamingAsrService : IAsrService, IStreamingAudio
         }
         catch (JsonException ex)
         {
-            StatusChanged?.Invoke(this, $"AssemblyAI 返回解析失败：{ex.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("AssemblyAiParseFailed", ex.Message));
         }
     }
 

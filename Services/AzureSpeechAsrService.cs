@@ -1,5 +1,6 @@
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
+using LiveCaptioner.Localization;
 
 namespace LiveCaptioner.Services;
 
@@ -33,7 +34,7 @@ public sealed class AzureSpeechAsrService : IAsrService, IStreamingAudioConsumer
 
         if (string.IsNullOrWhiteSpace(_subscriptionKey) || string.IsNullOrWhiteSpace(_region))
         {
-            StatusChanged?.Invoke(this, "未配置 Azure Speech Key 或 Region，无法启动微软在线识别");
+            StatusChanged?.Invoke(this, LocalizationManager.T("AzureMissingConfig"));
             return;
         }
 
@@ -53,9 +54,9 @@ public sealed class AzureSpeechAsrService : IAsrService, IStreamingAudioConsumer
             }
         };
         _recognizer.Canceled += (_, e) =>
-            StatusChanged?.Invoke(this, $"Azure Speech 已取消：{e.Reason} {e.ErrorDetails}");
-        _recognizer.SessionStarted += (_, _) => StatusChanged?.Invoke(this, $"Azure Speech 在线识别已连接：{_language}");
-        _recognizer.SessionStopped += (_, _) => StatusChanged?.Invoke(this, "Azure Speech 会话已结束");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("AzureSpeechCancelled", e.Reason, e.ErrorDetails));
+        _recognizer.SessionStarted += (_, _) => StatusChanged?.Invoke(this, LocalizationManager.Format("AzureConnected", _language));
+        _recognizer.SessionStopped += (_, _) => StatusChanged?.Invoke(this, LocalizationManager.T("AzureSessionEnded"));
 
         await _recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
     }

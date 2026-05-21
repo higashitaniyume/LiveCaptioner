@@ -2,6 +2,8 @@ namespace LiveCaptioner.Models;
 
 public sealed class AppSettings
 {
+    public string Language { get; set; } = "zh-CN";
+    public string TargetLanguage { get; set; } = "zh-CN";
     public string DeepSeekApiKey { get; set; } = string.Empty;
     public string DeepSeekModel { get; set; } = "deepseek-v4-flash";
     public string LlmProvider { get; set; } = "deepseek";

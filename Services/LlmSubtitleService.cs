@@ -3,22 +3,29 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using LiveCaptioner.Localization;
 using LiveCaptioner.Models;
 
 namespace LiveCaptioner.Services;
 
 public sealed class LlmSubtitleService : IDisposable
 {
-    private const string SystemPrompt =
-        """
-        你是一个高精度的实时双语字幕助手。请对输入的粗糙语音识别文本进行：
-        1. 纠正同音错别字和明显 ASR 错误；
-        2. 根据语气合理添加标点符号；
-        3. 保留原文语言，输出校正后的原文；
-        4. 输出对应的简体中文翻译；如果原文已经是中文，则中文翻译字段输出同一句校正后的中文。
-        严格只输出 JSON，不要 Markdown，不要解释。格式：
-        {"corrected_text":"校正后的原文","translated_text":"简体中文翻译"}
-        """;
+    private static readonly Dictionary<string, string> TargetLanguageNames = new()
+    {
+        ["zh-CN"] = "简体中文",
+        ["zh-TW"] = "繁體中文",
+        ["en"] = "English",
+        ["ja"] = "日本語",
+        ["ko"] = "한국어",
+        ["fr"] = "Français",
+        ["de"] = "Deutsch",
+        ["es"] = "Español",
+        ["pt"] = "Português",
+        ["ru"] = "Русский",
+        ["ar"] = "العربية",
+        ["th"] = "ไทย",
+        ["vi"] = "Tiếng Việt",
+    };
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly HttpClient _httpClient;
@@ -36,8 +43,17 @@ public sealed class LlmSubtitleService : IDisposable
     public string ApiKey { get; set; } = string.Empty;
     public string BaseUrl { get; set; } = "https://api.deepseek.com/v1";
     public string Model { get; set; } = "deepseek-v4-flash";
+    public string TargetLanguage { get; set; } = "zh-CN";
     public bool AutoTranslate { get; set; } = true;
     public bool BilingualComparison { get; set; } = true;
+
+    private string BuildSystemPrompt()
+    {
+        var targetName = TargetLanguageNames.TryGetValue(TargetLanguage, out var name)
+            ? name
+            : TargetLanguage;
+        return LocalizationManager.T("LlmSystemPrompt").Replace("{TargetLanguage}", targetName);
+    }
 
     public event EventHandler<BilingualSubtitle>? SubtitleReady;
     public event EventHandler<string>? StatusChanged;
@@ -77,7 +93,7 @@ public sealed class LlmSubtitleService : IDisposable
 
         if (string.IsNullOrWhiteSpace(ApiKey))
         {
-            StatusChanged?.Invoke(this, "未配置 LLM API Key，显示原始识别文本");
+            StatusChanged?.Invoke(this, LocalizationManager.T("LlmMissingKey"));
             return BilingualSubtitle.Raw(rawText);
         }
 
@@ -95,7 +111,7 @@ public sealed class LlmSubtitleService : IDisposable
         }
         catch (Exception ex)
         {
-            StatusChanged?.Invoke(this, $"LLM 暂不可用：{ex.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("LlmUnavailable", ex.Message));
             return BilingualSubtitle.Raw(rawText);
         }
     }
@@ -111,7 +127,7 @@ public sealed class LlmSubtitleService : IDisposable
             response_format = new { type = "json_object" },
             messages = new[]
             {
-                new { role = "system", content = SystemPrompt },
+                new { role = "system", content = BuildSystemPrompt() },
                 new { role = "user", content = rawText }
             }
         }, options: JsonOptions);
@@ -119,7 +135,7 @@ public sealed class LlmSubtitleService : IDisposable
         using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
-            StatusChanged?.Invoke(this, $"LLM 请求失败：{(int)response.StatusCode} {response.ReasonPhrase}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("LlmRequestFailed", (int)response.StatusCode, response.ReasonPhrase));
             return null;
         }
 
@@ -140,7 +156,7 @@ public sealed class LlmSubtitleService : IDisposable
             model = Model,
             max_tokens = 800,
             temperature = 0.2,
-            system = SystemPrompt,
+            system = BuildSystemPrompt(),
             messages = new[]
             {
                 new { role = "user", content = rawText }
@@ -150,7 +166,7 @@ public sealed class LlmSubtitleService : IDisposable
         using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
-            StatusChanged?.Invoke(this, $"Claude 请求失败：{(int)response.StatusCode} {response.ReasonPhrase}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("ClaudeRequestFailed", (int)response.StatusCode, response.ReasonPhrase));
             return null;
         }
 
@@ -190,7 +206,7 @@ public sealed class LlmSubtitleService : IDisposable
         }
         catch (JsonException)
         {
-            StatusChanged?.Invoke(this, "LLM 返回格式不是 JSON，显示返回文本");
+            StatusChanged?.Invoke(this, LocalizationManager.T("LlmJsonParseFailed"));
             return new BilingualSubtitle
             {
                 RawText = rawText.Trim(),

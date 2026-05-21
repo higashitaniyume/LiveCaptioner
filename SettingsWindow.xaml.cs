@@ -1,16 +1,27 @@
 using System.Text.Json;
 using System.Windows;
 
+using LiveCaptioner.Localization;
 using LiveCaptioner.Models;
 
 namespace LiveCaptioner;
 
 public partial class SettingsWindow : Window
 {
+    private readonly string _originalLanguage;
+
+    private static readonly Dictionary<string, List<string>> ProviderModels = new()
+    {
+        ["deepseek"] = ["deepseek-v4-flash", "deepseek-v4-1", "deepseek-v4-pro", "deepseek-v3", "deepseek-r1"],
+        ["openai"] = ["gpt-4o-mini", "gpt-4o", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-4.5-preview"],
+        ["claude"] = ["claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-7", "claude-3-5-haiku-latest"],
+    };
+
     public SettingsWindow(AppSettings settings)
     {
         InitializeComponent();
         Settings = Clone(settings);
+        _originalLanguage = settings.Language;
         LoadSettings();
         ApplySelectedPage();
     }
@@ -25,10 +36,13 @@ public partial class SettingsWindow : Window
 
     private void LoadSettings()
     {
+        SelectLanguage(Settings.Language);
         SelectCombo(LlmProviderBox, Settings.LlmProvider);
         LlmApiKeyBox.Password = Settings.LlmApiKey;
         LlmBaseUrlBox.Text = Settings.LlmBaseUrl;
         LlmModelBox.Text = Settings.LlmModel;
+        SelectTargetLanguage(Settings.TargetLanguage);
+        PopulateModelSuggestions(Settings.LlmProvider);
 
         SelectCombo(AsrProviderBox, Settings.AsrProvider);
         AssemblyAiKeyBox.Password = Settings.AssemblyAiApiKey;
@@ -53,6 +67,17 @@ public partial class SettingsWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
+        var newLanguage = ReadLanguage();
+        if (!string.Equals(_originalLanguage, newLanguage, StringComparison.OrdinalIgnoreCase))
+        {
+            System.Windows.MessageBox.Show(
+                LocalizationManager.T("LanguageChangedRestartMessage"),
+                LocalizationManager.T("LanguageChangedRestartTitle"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        Settings.Language = newLanguage;
         Settings.LlmProvider = ReadCombo(LlmProviderBox, "deepseek");
         Settings.LlmApiKey = LlmApiKeyBox.Password.Trim();
         Settings.LlmBaseUrl = string.IsNullOrWhiteSpace(LlmBaseUrlBox.Text)
@@ -61,6 +86,7 @@ public partial class SettingsWindow : Window
         Settings.LlmModel = string.IsNullOrWhiteSpace(LlmModelBox.Text)
             ? GetDefaultLlmModel(Settings.LlmProvider)
             : LlmModelBox.Text.Trim();
+        Settings.TargetLanguage = ReadTargetLanguage();
         Settings.DeepSeekApiKey = Settings.LlmApiKey;
         Settings.DeepSeekModel = Settings.LlmModel;
 
@@ -103,6 +129,28 @@ public partial class SettingsWindow : Window
         ApplySelectedPage();
     }
 
+    private void LlmProviderBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        var provider = ReadCombo(LlmProviderBox, "deepseek");
+        PopulateModelSuggestions(provider);
+    }
+
+    private void PopulateModelSuggestions(string provider)
+    {
+        var currentText = LlmModelBox.Text;
+
+        LlmModelBox.Items.Clear();
+        if (ProviderModels.TryGetValue(provider, out var models))
+        {
+            foreach (var model in models)
+            {
+                LlmModelBox.Items.Add(model);
+            }
+        }
+
+        LlmModelBox.Text = currentText;
+    }
+
     private void ApplySelectedPage()
     {
         if (GeneralPage is null || SttPage is null || LlmPage is null || AppearancePage is null || NavList is null)
@@ -136,6 +184,55 @@ public partial class SettingsWindow : Window
                item.Content?.ToString() is { Length: > 0 } value
             ? value.ToLowerInvariant()
             : fallback;
+    }
+
+    private void SelectLanguage(string language)
+    {
+        foreach (var item in LanguageBox.Items.OfType<System.Windows.Controls.ComboBoxItem>())
+        {
+            if (string.Equals(item.Tag?.ToString(), language, StringComparison.OrdinalIgnoreCase))
+            {
+                LanguageBox.SelectedItem = item;
+                return;
+            }
+        }
+
+        LanguageBox.SelectedIndex = 0;
+    }
+
+    private string ReadLanguage()
+    {
+        return LanguageBox.SelectedItem is System.Windows.Controls.ComboBoxItem item &&
+               item.Tag?.ToString() is { Length: > 0 } language
+            ? language
+            : LocalizationManager.Language;
+    }
+
+    private void SelectTargetLanguage(string language)
+    {
+        foreach (var item in TargetLanguageBox.Items.OfType<System.Windows.Controls.ComboBoxItem>())
+        {
+            if (string.Equals(item.Tag?.ToString(), language, StringComparison.OrdinalIgnoreCase))
+            {
+                TargetLanguageBox.SelectedItem = item;
+                return;
+            }
+        }
+
+        TargetLanguageBox.SelectedIndex = 0;
+    }
+
+    private static string ReadTargetLanguage(System.Windows.Controls.ComboBox comboBox)
+    {
+        return comboBox.SelectedItem is System.Windows.Controls.ComboBoxItem item &&
+               item.Tag?.ToString() is { Length: > 0 } language
+            ? language
+            : "zh-CN";
+    }
+
+    private string ReadTargetLanguage()
+    {
+        return ReadTargetLanguage(TargetLanguageBox);
     }
 
     private static string GetDefaultLlmBaseUrl(string provider)

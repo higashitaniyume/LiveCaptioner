@@ -3,22 +3,14 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using LiveCaptioner.Localization;
 using LiveCaptioner.Models;
 
 namespace LiveCaptioner.Services;
 
 public sealed class DeepSeekService : IDisposable
 {
-    private const string SystemPrompt =
-        """
-        你是一个高精度的实时双语字幕助手。请对输入的粗糙语音识别文本进行：
-        1. 纠正同音错别字和明显 ASR 错误；
-        2. 根据语气合理添加标点符号；
-        3. 保留原文语言，输出校正后的原文；
-        4. 输出对应的简体中文翻译；如果原文已经是中文，则中文翻译字段输出同一句校正后的中文。
-        严格只输出 JSON，不要 Markdown，不要解释。格式：
-        {"corrected_text":"校正后的原文","translated_text":"简体中文翻译"}
-        """;
+    private static string SystemPrompt => LocalizationManager.T("LlmSystemPrompt");
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly HttpClient _httpClient;
@@ -81,7 +73,7 @@ public sealed class DeepSeekService : IDisposable
 
         if (string.IsNullOrWhiteSpace(_apiKey))
         {
-            StatusChanged?.Invoke(this, "未配置 DeepSeek API Key，显示原始识别文本");
+            StatusChanged?.Invoke(this, LocalizationManager.T("DeepSeekMissingKey"));
             return BilingualSubtitle.Raw(rawText);
         }
 
@@ -103,7 +95,7 @@ public sealed class DeepSeekService : IDisposable
             using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
-                StatusChanged?.Invoke(this, $"DeepSeek 请求失败：{(int)response.StatusCode} {response.ReasonPhrase}");
+                StatusChanged?.Invoke(this, LocalizationManager.Format("DeepSeekRequestFailed", (int)response.StatusCode, response.ReasonPhrase));
                 return BilingualSubtitle.Raw(rawText);
             }
 
@@ -120,7 +112,7 @@ public sealed class DeepSeekService : IDisposable
         }
         catch (Exception ex)
         {
-            StatusChanged?.Invoke(this, $"DeepSeek 暂不可用：{ex.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("DeepSeekUnavailable", ex.Message));
             return BilingualSubtitle.Raw(rawText);
         }
     }
@@ -152,7 +144,7 @@ public sealed class DeepSeekService : IDisposable
         }
         catch (JsonException)
         {
-            StatusChanged?.Invoke(this, "DeepSeek 返回格式不是 JSON，显示返回文本");
+            StatusChanged?.Invoke(this, LocalizationManager.T("DeepSeekJsonParseFailed"));
             return new BilingualSubtitle
             {
                 RawText = rawText.Trim(),

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using LiveCaptioner.Localization;
 using LiveCaptioner.Models;
 using LiveCaptioner.Native;
 using LiveCaptioner.Services;
@@ -42,6 +43,7 @@ public partial class MainWindow : Window
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
         _settings = _settingsService.Load();
+        LocalizationManager.ApplyCulture(_settings.Language);
         InitializeTrayIcon();
         ApplyVisualSettings();
         if (_settings.ClickThrough)
@@ -61,7 +63,8 @@ public partial class MainWindow : Window
             BaseUrl = _settings.LlmBaseUrl,
             AutoTranslate = _settings.AutoTranslate,
             BilingualComparison = _settings.BilingualComparison,
-            Model = _settings.LlmModel
+            Model = _settings.LlmModel,
+            TargetLanguage = _settings.TargetLanguage
         };
         _inlineHistoryItems.Clear();
         await RefreshConversationListAsync(selectCurrent: true);
@@ -89,7 +92,7 @@ public partial class MainWindow : Window
         _hotKeyRegistered = WindowNativeMethods.RegisterRestoreHotKey(this);
         if (!_hotKeyRegistered)
         {
-            SetStatus("全局热键 Ctrl+Alt+C 注册失败，可能已被占用");
+            SetStatus(LocalizationManager.T("HotKeyRegistrationFailed"));
         }
     }
 
@@ -97,7 +100,7 @@ public partial class MainWindow : Window
     {
         if (msg == WindowNativeMethods.WmHotKey && wParam.ToInt32() == WindowNativeMethods.HotKeyId)
         {
-            DisableClickThrough("已通过 Ctrl+Alt+C 恢复交互", showSettings: false);
+            DisableClickThrough(LocalizationManager.T("RestoredByHotkey"), showSettings: false);
             handled = true;
         }
 
@@ -114,12 +117,12 @@ public partial class MainWindow : Window
             }
 
             _audioCaptureService?.Start();
-            StartStopMenuItem.Header = "停止捕获";
+            StartStopMenuItem.Header = LocalizationManager.T("StopCapture");
         }
         catch (Exception ex)
         {
-            SetStatus($"启动失败：{ex.Message}");
-            SetCaption(BilingualSubtitle.Raw("LiveCaptioner 启动失败，请检查音频设备和模型文件。"));
+            SetStatus(LocalizationManager.Format("StartFailed", ex.Message));
+            SetCaption(BilingualSubtitle.Raw(LocalizationManager.T("StartupFailedCaption")));
         }
     }
 
@@ -131,7 +134,7 @@ public partial class MainWindow : Window
             await _asrService.StopAsync();
         }
 
-        StartStopMenuItem.Header = "启动捕获";
+        StartStopMenuItem.Header = LocalizationManager.T("StartCapture");
     }
 
     private void CaptionSurface_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -184,7 +187,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            DisableClickThrough("鼠标穿透已关闭", showSettings: false);
+            DisableClickThrough(LocalizationManager.T("ClickThroughDisabled"), showSettings: false);
         }
 
         await SaveSettingsAsync();
@@ -213,11 +216,11 @@ public partial class MainWindow : Window
             HistoryPathText.Text = _historyService.CurrentConversationPath;
             await LoadCurrentConversationToInlineAsync();
             await RefreshHistoryAsync();
-            SetStatus($"已切换到 {conversation.DisplayName}");
+            SetStatus(LocalizationManager.Format("SwitchedConversation", conversation.DisplayName));
         }
         catch (Exception ex)
         {
-            SetStatus($"切换对话失败：{ex.Message}");
+            SetStatus(LocalizationManager.Format("SwitchConversationFailed", ex.Message));
         }
     }
 
@@ -239,14 +242,14 @@ public partial class MainWindow : Window
         }
 
         var contextMenu = new System.Windows.Forms.ContextMenuStrip();
-        contextMenu.Items.Add("恢复窗口交互", null, (_, _) =>
-            Dispatcher.Invoke(() => DisableClickThrough("已从托盘恢复交互", showSettings: false)));
-        contextMenu.Items.Add("切换鼠标穿透", null, async (_, _) =>
+        contextMenu.Items.Add(LocalizationManager.T("RestoreWindowInteraction"), null, (_, _) =>
+            Dispatcher.Invoke(() => DisableClickThrough(LocalizationManager.T("RestoredFromTray"), showSettings: false)));
+        contextMenu.Items.Add(LocalizationManager.T("ToggleClickThrough"), null, async (_, _) =>
             await Dispatcher.InvokeAsync(async () =>
             {
                 if (_settings.ClickThrough)
                 {
-                    DisableClickThrough("鼠标穿透已关闭", showSettings: false);
+                    DisableClickThrough(LocalizationManager.T("ClickThroughDisabled"), showSettings: false);
                 }
                 else
                 {
@@ -255,25 +258,25 @@ public partial class MainWindow : Window
 
                 await SaveSettingsAsync();
             }));
-        contextMenu.Items.Add("设置", null, (_, _) =>
+        contextMenu.Items.Add(LocalizationManager.T("Settings"), null, (_, _) =>
             Dispatcher.Invoke(async () =>
             {
-                DisableClickThrough("已恢复交互并打开设置", showSettings: false);
+                DisableClickThrough(LocalizationManager.T("RestoredOpenSettings"), showSettings: false);
                 await OpenSettingsWindowAsync();
             }));
         contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-        contextMenu.Items.Add("退出", null, (_, _) => Dispatcher.Invoke(Close));
+        contextMenu.Items.Add(LocalizationManager.T("Exit"), null, (_, _) => Dispatcher.Invoke(Close));
 
         _notifyIcon = new System.Windows.Forms.NotifyIcon
         {
             Icon = SystemIcons.Application,
-            Text = "LiveCaptioner - Ctrl+Alt+C 恢复交互",
+            Text = LocalizationManager.T("TrayText"),
             ContextMenuStrip = contextMenu,
             Visible = true
         };
 
         _notifyIcon.DoubleClick += (_, _) =>
-            Dispatcher.Invoke(() => DisableClickThrough("已从托盘恢复交互", showSettings: false));
+            Dispatcher.Invoke(() => DisableClickThrough(LocalizationManager.T("RestoredFromTray"), showSettings: false));
     }
 
     private void EnableClickThroughWithGrace(TimeSpan delay, bool save)
@@ -286,7 +289,7 @@ public partial class MainWindow : Window
         SyncClickThroughControls(true);
         BringOverlayToFront();
         WindowNativeMethods.SetClickThrough(this, false);
-        SetStatus($"鼠标穿透将在 {Math.Ceiling(delay.TotalSeconds):0} 秒后开启；可用 Ctrl+Alt+C 或托盘菜单恢复交互");
+        SetStatus(LocalizationManager.Format("ClickThroughEnableCountdown", Math.Ceiling(delay.TotalSeconds)));
 
         var token = _clickThroughGraceCts.Token;
         _ = Task.Run(async () =>
@@ -302,11 +305,11 @@ public partial class MainWindow : Window
                     }
 
                     WindowNativeMethods.SetClickThrough(this, true);
-                    SetStatus("鼠标穿透已开启。恢复交互：Ctrl+Alt+C，或双击托盘图标。");
+                    SetStatus(LocalizationManager.T("ClickThroughEnabled"));
                     _notifyIcon?.ShowBalloonTip(
                         2500,
-                        "LiveCaptioner 鼠标穿透已开启",
-                        "按 Ctrl+Alt+C 或双击托盘图标可恢复交互。",
+                        LocalizationManager.T("ClickThroughBalloonTitle"),
+                        LocalizationManager.T("ClickThroughBalloonText"),
                         System.Windows.Forms.ToolTipIcon.Info);
                 });
             }
@@ -391,6 +394,7 @@ public partial class MainWindow : Window
         var previousGoogleLanguage = _settings.GoogleSpeechLanguage;
         var previousWhisperModel = _settings.WhisperModel;
         var previousAsrBackend = _settings.AsrBackend;
+        var previousLanguage = _settings.Language;
 
         _settings = updatedSettings;
         if (_llmService is not null)
@@ -401,6 +405,7 @@ public partial class MainWindow : Window
             _llmService.AutoTranslate = _settings.AutoTranslate;
             _llmService.BilingualComparison = _settings.BilingualComparison;
             _llmService.Model = _settings.LlmModel;
+            _llmService.TargetLanguage = _settings.TargetLanguage;
         }
 
         ApplyVisualSettings();
@@ -410,7 +415,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            DisableClickThrough("鼠标穿透已关闭", showSettings: false);
+            DisableClickThrough(LocalizationManager.T("ClickThroughDisabled"), showSettings: false);
         }
 
         await SaveSettingsAsync();
@@ -429,10 +434,17 @@ public partial class MainWindow : Window
         }
         else if (!string.Equals(previousAsrBackend, _settings.AsrBackend, StringComparison.OrdinalIgnoreCase))
         {
-            SetStatus("ASR 后端已保存。Whisper 原生运行时已加载，完全切换后端需要重启应用。");
+            SetStatus(LocalizationManager.T("AsrBackendSavedRequiresRestart"));
         }
 
-        SetStatus("设置已保存");
+        if (!string.Equals(previousLanguage, _settings.Language, StringComparison.OrdinalIgnoreCase))
+        {
+            LocalizationManager.ApplyCulture(_settings.Language);
+            SetStatus(LocalizationManager.T("LanguageRestartRequired"));
+            return;
+        }
+
+        SetStatus(LocalizationManager.T("SettingsSaved"));
     }
 
     private void ApplyVisualSettings()
@@ -454,7 +466,7 @@ public partial class MainWindow : Window
     {
         if (_audioBuffer is null)
         {
-            throw new InvalidOperationException("音频缓冲区尚未初始化。");
+            throw new InvalidOperationException(LocalizationManager.T("AudioBufferNotInitialized"));
         }
 
         if (string.Equals(_settings.AsrProvider, "assemblyai", StringComparison.OrdinalIgnoreCase))
@@ -474,7 +486,7 @@ public partial class MainWindow : Window
 
         if (string.Equals(_settings.AsrProvider, "custom", StringComparison.OrdinalIgnoreCase))
         {
-            return new UnsupportedAsrService("自定义 STT WebSocket 已预留配置入口，当前版本尚未实现协议适配。");
+            return new UnsupportedAsrService(LocalizationManager.T("CustomSttUnsupported"));
         }
 
         var modelPath = Path.Combine(
@@ -518,7 +530,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            SetStatus($"识别方式已切换为 {_settings.AsrProvider}");
+            SetStatus(LocalizationManager.Format("AsrProviderSwitched", _settings.AsrProvider));
         }
     }
 
@@ -530,7 +542,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            SetStatus($"保存设置失败：{ex.Message}");
+            SetStatus(LocalizationManager.Format("SaveSettingsFailed", ex.Message));
         }
     }
 
@@ -547,7 +559,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            SetStatus($"保存历史失败：{ex.Message}");
+            SetStatus(LocalizationManager.Format("SaveHistoryFailed", ex.Message));
         }
     }
 
@@ -570,7 +582,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            SetStatus($"读取历史失败：{ex.Message}");
+            SetStatus(LocalizationManager.Format("ReadHistoryFailed", ex.Message));
         }
     }
 
@@ -614,7 +626,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            SetStatus($"加载主页面历史失败：{ex.Message}");
+            SetStatus(LocalizationManager.Format("LoadInlineHistoryFailed", ex.Message));
         }
     }
 
@@ -630,13 +642,13 @@ public partial class MainWindow : Window
         {
             _inlineHistoryItems.Clear();
             HistoryList.ItemsSource = null;
-            PrimaryCaptionText.Text = "已开始新的对话";
+            PrimaryCaptionText.Text = LocalizationManager.T("NewConversationCaption");
             SecondaryCaptionText.Text = string.Empty;
             SecondaryCaptionText.Visibility = Visibility.Collapsed;
         });
 
         await RefreshConversationListAsync(selectCurrent: true);
-        SetStatus($"新对话：{conversation.DisplayName}");
+        SetStatus(LocalizationManager.Format("NewConversationStatus", conversation.DisplayName));
     }
 
     private Task RefreshConversationListAsync(bool selectCurrent)

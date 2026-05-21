@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using LiveCaptioner.Localization;
 using LiveCaptioner.Models;
 
 namespace LiveCaptioner.Services;
@@ -48,7 +49,7 @@ public sealed class CaptionHistoryService
 
         if (conversation is null)
         {
-            throw new InvalidOperationException("找不到指定的对话历史。");
+            throw new InvalidOperationException(LocalizationManager.T("MissingConversationHistory"));
         }
 
         CurrentConversation = conversation;

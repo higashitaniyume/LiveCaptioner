@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using LiveCaptioner.Localization;
 using Whisper.net;
 using Whisper.net.Ggml;
 using Whisper.net.LibraryLoader;
@@ -77,7 +78,7 @@ public sealed class AsrService : IAsrService
         try
         {
             await EnsureInitializedAsync(cancellationToken).ConfigureAwait(false);
-            StatusChanged?.Invoke(this, "本地 Whisper ASR 已就绪");
+            StatusChanged?.Invoke(this, LocalizationManager.T("AsrReady"));
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -95,7 +96,7 @@ public sealed class AsrService : IAsrService
         }
         catch (Exception ex)
         {
-            StatusChanged?.Invoke(this, $"ASR 服务停止：{ex.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("AsrServiceStopped", ex.Message));
         }
     }
 
@@ -110,7 +111,7 @@ public sealed class AsrService : IAsrService
 
         if (!File.Exists(_modelPath))
         {
-            StatusChanged?.Invoke(this, $"正在下载 Whisper {_modelName} 模型，首次启动可能需要几分钟");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("DownloadingWhisperModel", _modelName));
             await using var modelStream = await WhisperGgmlDownloader.Default
                 .GetGgmlModelAsync(_modelType)
                 .ConfigureAwait(false);
@@ -119,14 +120,14 @@ public sealed class AsrService : IAsrService
         }
 
         _factory = CreateFactoryWithFallback();
-        StatusChanged?.Invoke(this, $"Whisper 运行时：{WhisperFactory.GetRuntimeInfo()}");
+        StatusChanged?.Invoke(this, LocalizationManager.Format("AsrRuntime", WhisperFactory.GetRuntimeInfo()));
         _processor = _factory.CreateBuilder()
             .WithLanguageDetection()
             .WithThreads(Math.Max(1, Environment.ProcessorCount - 1))
             .WithNoSpeechThreshold(0.65f)
             .WithMaxSegmentLength(60)
             .WithSingleSegment()
-            .WithPrompt("以下是 Windows 系统声音的连续实时字幕，请保持上下文连贯。")
+            .WithPrompt(LocalizationManager.T("WhisperPrompt"))
             .Build();
     }
 
@@ -156,14 +157,14 @@ public sealed class AsrService : IAsrService
         }
         catch (Exception ex)
         {
-            StatusChanged?.Invoke(this, $"ASR 识别失败：{ex.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("AsrFailed", ex.Message));
             return;
         }
 
         var text = builder.ToString().Trim();
         if (string.IsNullOrWhiteSpace(text))
         {
-            StatusChanged?.Invoke(this, "等待可识别语音");
+            StatusChanged?.Invoke(this, LocalizationManager.T("WaitingForSpeech"));
             return;
         }
 
@@ -255,7 +256,7 @@ public sealed class AsrService : IAsrService
         }
         catch (Exception ex) when (_backend != "cpu")
         {
-            StatusChanged?.Invoke(this, $"GPU 后端初始化失败，回退 CPU：{ex.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("GpuBackendFallback", ex.Message));
             ConfigureRuntime("cpu");
             return WhisperFactory.FromPath(_modelPath, new WhisperFactoryOptions
             {

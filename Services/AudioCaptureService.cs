@@ -1,4 +1,5 @@
 using System.IO;
+using LiveCaptioner.Localization;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
@@ -35,7 +36,7 @@ public sealed class AudioCaptureService : IDisposable
         _capture.RecordingStopped += CaptureOnRecordingStopped;
         _capture.StartRecording();
 
-        StatusChanged?.Invoke(this, $"系统音频捕获已启动：{_capture.WaveFormat}");
+        StatusChanged?.Invoke(this, LocalizationManager.Format("AudioCaptureStarted", _capture.WaveFormat));
     }
 
     public void Stop()
@@ -49,7 +50,7 @@ public sealed class AudioCaptureService : IDisposable
         capture.StopRecording();
         DetachAndDispose(capture);
         _capture = null;
-        StatusChanged?.Invoke(this, "系统音频捕获已停止");
+        StatusChanged?.Invoke(this, LocalizationManager.T("AudioCaptureStopped"));
     }
 
     private void CaptureOnDataAvailable(object? sender, WaveInEventArgs e)
@@ -67,7 +68,7 @@ public sealed class AudioCaptureService : IDisposable
         }
         catch (Exception ex)
         {
-            StatusChanged?.Invoke(this, $"音频重采样失败：{ex.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("AudioResampleFailed", ex.Message));
         }
     }
 
@@ -75,7 +76,7 @@ public sealed class AudioCaptureService : IDisposable
     {
         if (e.Exception is not null)
         {
-            StatusChanged?.Invoke(this, $"音频捕获中断：{e.Exception.Message}");
+            StatusChanged?.Invoke(this, LocalizationManager.Format("AudioCaptureInterrupted", e.Exception.Message));
         }
     }
 

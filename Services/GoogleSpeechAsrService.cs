@@ -1,6 +1,7 @@
 using System.Threading.Channels;
 using Google.Cloud.Speech.V1;
 using Google.Protobuf;
+using LiveCaptioner.Localization;
 
 namespace LiveCaptioner.Services;
 
@@ -66,7 +67,7 @@ public sealed class GoogleSpeechAsrService : IAsrService, IStreamingAudioConsume
 
         _sendTask = Task.Run(() => SendLoopAsync(_cts.Token));
         _receiveTask = Task.Run(() => ReceiveLoopAsync(_cts.Token));
-        StatusChanged?.Invoke(this, $"Google Speech 在线识别已连接：{_language}");
+        StatusChanged?.Invoke(this, LocalizationManager.Format("GoogleConnected", _language));
     }
 
     public async Task StopAsync()

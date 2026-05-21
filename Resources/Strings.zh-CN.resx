@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppStartingCaption" xml:space="preserve"><value>LiveCaptioner 正在启动...</value></data>
+  <data name="ApiKey" xml:space="preserve"><value>API Key</value></data>
+  <data name="ApiUrlBaseUrl" xml:space="preserve"><value>API URL / Base URL</value></data>
+  <data name="Appearance" xml:space="preserve"><value>外观</value></data>
+  <data name="AsrBackendSavedRequiresRestart" xml:space="preserve"><value>ASR 后端已保存。Whisper 原生运行时已加载，完全切换后端需要重启应用。</value></data>
+  <data name="AsrFailed" xml:space="preserve"><value>ASR 识别失败：{0}</value></data>
+  <data name="AsrReady" xml:space="preserve"><value>本地 Whisper ASR 已就绪</value></data>
+  <data name="AsrRuntime" xml:space="preserve"><value>Whisper 运行时：{0}</value></data>
+  <data name="AsrServiceStopped" xml:space="preserve"><value>ASR 服务停止：{0}</value></data>
+  <data name="AsrProviderSwitched" xml:space="preserve"><value>识别方式已切换为 {0}</value></data>
+  <data name="AssemblyAiConnected" xml:space="preserve"><value>AssemblyAI 在线识别已连接：{0}</value></data>
+  <data name="AssemblyAiClosed" xml:space="preserve"><value>AssemblyAI 连接关闭：{0}</value></data>
+  <data name="AssemblyAiMissingKey" xml:space="preserve"><value>未配置 AssemblyAI API Key，无法启动在线识别</value></data>
+  <data name="AssemblyAiParseFailed" xml:space="preserve"><value>AssemblyAI 返回解析失败：{0}</value></data>
+  <data name="AssemblyAiSessionEnded" xml:space="preserve"><value>AssemblyAI 会话已结束</value></data>
+  <data name="AssemblyAiSessionStarted" xml:space="preserve"><value>AssemblyAI 会话已开始：{0}</value></data>
+  <data name="AssemblyAiStopFailed" xml:space="preserve"><value>AssemblyAI 停止失败：{0}</value></data>
+  <data name="AudioBufferNotInitialized" xml:space="preserve"><value>音频缓冲区尚未初始化。</value></data>
+  <data name="AudioCaptureInterrupted" xml:space="preserve"><value>音频捕获中断：{0}</value></data>
+  <data name="AudioCaptureStarted" xml:space="preserve"><value>系统音频捕获已启动：{0}</value></data>
+  <data name="AudioCaptureStopped" xml:space="preserve"><value>系统音频捕获已停止</value></data>
+  <data name="AudioResampleFailed" xml:space="preserve"><value>音频重采样失败：{0}</value></data>
+  <data name="AutoTranslate" xml:space="preserve"><value>自动润色 / 翻译</value></data>
+  <data name="AzureConnected" xml:space="preserve"><value>Azure Speech 在线识别已连接：{0}</value></data>
+  <data name="AzureMissingConfig" xml:space="preserve"><value>未配置 Azure Speech Key 或 Region，无法启动微软在线识别</value></data>
+  <data name="AzureSessionEnded" xml:space="preserve"><value>Azure Speech 会话已结束</value></data>
+  <data name="AzureSpeechCancelled" xml:space="preserve"><value>Azure Speech 已取消：{0} {1}</value></data>
+  <data name="BackgroundOpacity" xml:space="preserve"><value>背景透明度</value></data>
+  <data name="Backend" xml:space="preserve"><value>后端</value></data>
+  <data name="BilingualComparison" xml:space="preserve"><value>实时双语对照</value></data>
+  <data name="Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="ClickThrough" xml:space="preserve"><value>鼠标穿透</value></data>
+  <data name="ClickThroughBalloonText" xml:space="preserve"><value>按 Ctrl+Alt+C 或双击托盘图标可恢复交互。</value></data>
+  <data name="ClickThroughBalloonTitle" xml:space="preserve"><value>LiveCaptioner 鼠标穿透已开启</value></data>
+  <data name="ClickThroughDisabled" xml:space="preserve"><value>鼠标穿透已关闭</value></data>
+  <data name="ClickThroughEnableCountdown" xml:space="preserve"><value>鼠标穿透将在 {0} 秒后开启；可用 Ctrl+Alt+C 或托盘菜单恢复交互</value></data>
+  <data name="ClickThroughEnabled" xml:space="preserve"><value>鼠标穿透已开启。恢复交互：Ctrl+Alt+C，或双击托盘图标。</value></data>
+  <data name="ClickThroughToolTip" xml:space="preserve"><value>启用后可用 Ctrl+Alt+C 或托盘菜单恢复交互</value></data>
+  <data name="Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="ClaudeRequestFailed" xml:space="preserve"><value>Claude 请求失败：{0} {1}</value></data>
+  <data name="ConversationDisplayName" xml:space="preserve"><value>对话 {0:MM-dd HH:mm:ss}</value></data>
+  <data name="CustomStt" xml:space="preserve"><value>自定义 STT</value></data>
+  <data name="CustomSttUnsupported" xml:space="preserve"><value>自定义 STT WebSocket 已预留配置入口，当前版本尚未实现协议适配。</value></data>
+  <data name="DeepSeekJsonParseFailed" xml:space="preserve"><value>DeepSeek 返回格式不是 JSON，显示返回文本</value></data>
+  <data name="DeepSeekMissingKey" xml:space="preserve"><value>未配置 DeepSeek API Key，显示原始识别文本</value></data>
+  <data name="DeepSeekRequestFailed" xml:space="preserve"><value>DeepSeek 请求失败：{0} {1}</value></data>
+  <data name="DeepSeekUnavailable" xml:space="preserve"><value>DeepSeek 暂不可用：{0}</value></data>
+  <data name="DownloadingWhisperModel" xml:space="preserve"><value>正在下载 Whisper {0} 模型，首次启动可能需要几分钟</value></data>
+  <data name="Exit" xml:space="preserve"><value>退出</value></data>
+  <data name="FontSize" xml:space="preserve"><value>字体大小</value></data>
+  <data name="General" xml:space="preserve"><value>通用</value></data>
+  <data name="GoogleConnected" xml:space="preserve"><value>Google Speech 在线识别已连接：{0}</value></data>
+  <data name="GoogleCredentialsPath" xml:space="preserve"><value>服务账号 JSON 路径</value></data>
+  <data name="GpuBackendFallback" xml:space="preserve"><value>GPU 后端初始化失败，回退 CPU：{0}</value></data>
+  <data name="History" xml:space="preserve"><value>历史记录</value></data>
+  <data name="HotKeyRegistrationFailed" xml:space="preserve"><value>全局热键 Ctrl+Alt+C 注册失败，可能已被占用</value></data>
+  <data name="Language" xml:space="preserve"><value>语言</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>英文</value></data>
+  <data name="LanguageRestartRequired" xml:space="preserve"><value>语言已保存，重启应用后会完整生效。</value></data>
+  <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>简体中文</value></data>
+  <data name="LoadInlineHistoryFailed" xml:space="preserve"><value>加载主页面历史失败：{0}</value></data>
+  <data name="LlmJsonParseFailed" xml:space="preserve"><value>LLM 返回格式不是 JSON，显示返回文本</value></data>
+  <data name="LlmMissingKey" xml:space="preserve"><value>未配置 LLM API Key，显示原始识别文本</value></data>
+  <data name="LlmModel" xml:space="preserve"><value>LLM 模型</value></data>
+  <data name="LlmRequestFailed" xml:space="preserve"><value>LLM 请求失败：{0} {1}</value></data>
+  <data name="LlmSystemPrompt" xml:space="preserve"><value>你是一个高精度的实时双语字幕助手。请对输入的粗糙语音识别文本进行：
+1. 纠正同音错别字和明显 ASR 错误；
+2. 根据语气合理添加标点符号；
+3. 保留原文语言，输出校正后的原文；
+4. 输出对应的{TargetLanguage}翻译；如果原文已经是{TargetLanguage}，则翻译字段输出同一句校正后的文本。
+严格只输出 JSON，不要 Markdown，不要解释。格式：
+{"corrected_text":"校正后的原文","translated_text":"{TargetLanguage}翻译"}</value></data>
+  <data name="LlmUnavailable" xml:space="preserve"><value>LLM 暂不可用：{0}</value></data>
+  <data name="LocalWhisper" xml:space="preserve"><value>本地 Whisper</value></data>
+  <data name="Model" xml:space="preserve"><value>模型</value></data>
+  <data name="MissingConversationHistory" xml:space="preserve"><value>找不到指定的对话历史。</value></data>
+  <data name="NewConversation" xml:space="preserve"><value>新对话</value></data>
+  <data name="NewConversationCaption" xml:space="preserve"><value>已开始新的对话</value></data>
+  <data name="NewConversationStatus" xml:space="preserve"><value>新对话：{0}</value></data>
+  <data name="Provider" xml:space="preserve"><value>提供商</value></data>
+  <data name="ReadHistoryFailed" xml:space="preserve"><value>读取历史失败：{0}</value></data>
+  <data name="RecognitionMethod" xml:space="preserve"><value>识别方式</value></data>
+  <data name="Refresh" xml:space="preserve"><value>刷新</value></data>
+  <data name="Region" xml:space="preserve"><value>区域</value></data>
+  <data name="RestoreWindowInteraction" xml:space="preserve"><value>恢复窗口交互</value></data>
+  <data name="RestoredByHotkey" xml:space="preserve"><value>已通过 Ctrl+Alt+C 恢复交互</value></data>
+  <data name="RestoredFromTray" xml:space="preserve"><value>已从托盘恢复交互</value></data>
+  <data name="RestoredOpenSettings" xml:space="preserve"><value>已恢复交互并打开设置</value></data>
+  <data name="Save" xml:space="preserve"><value>保存</value></data>
+  <data name="SaveHistory" xml:space="preserve"><value>保存字幕历史</value></data>
+  <data name="SaveHistoryFailed" xml:space="preserve"><value>保存历史失败：{0}</value></data>
+  <data name="SaveSettingsFailed" xml:space="preserve"><value>保存设置失败：{0}</value></data>
+  <data name="Settings" xml:space="preserve"><value>设置</value></data>
+  <data name="SettingsSaved" xml:space="preserve"><value>设置已保存</value></data>
+  <data name="SettingsSubtitle" xml:space="preserve"><value>字幕管线设置</value></data>
+  <data name="SettingsWindowTitle" xml:space="preserve"><value>LiveCaptioner 设置</value></data>
+  <data name="SpeechKey" xml:space="preserve"><value>Speech Key</value></data>
+  <data name="StartCapture" xml:space="preserve"><value>启动捕获</value></data>
+  <data name="StartFailed" xml:space="preserve"><value>启动失败：{0}</value></data>
+  <data name="StartupFailedCaption" xml:space="preserve"><value>LiveCaptioner 启动失败，请检查音频设备和模型文件。</value></data>
+  <data name="StopCapture" xml:space="preserve"><value>停止捕获</value></data>
+  <data name="SttRecognition" xml:space="preserve"><value>STT 识别</value></data>
+  <data name="SwitchConversationFailed" xml:space="preserve"><value>切换对话失败：{0}</value></data>
+  <data name="SwitchedConversation" xml:space="preserve"><value>已切换到 {0}</value></data>
+  <data name="ToggleClickThrough" xml:space="preserve"><value>切换鼠标穿透</value></data>
+  <data name="TrayText" xml:space="preserve"><value>LiveCaptioner - Ctrl+Alt+C 恢复交互</value></data>
+  <data name="WaitingForSpeech" xml:space="preserve"><value>等待可识别语音</value></data>
+  <data name="WebSocketUrl" xml:space="preserve"><value>WebSocket URL</value></data>
+  <data name="WhisperPrompt" xml:space="preserve"><value>以下是 Windows 系统声音的连续实时字幕，请保持上下文连贯。</value></data>
+  <data name="LanguageLabel" xml:space="preserve"><value>语言</value></data>
+  <data name="TargetLanguage" xml:space="preserve"><value>翻译目标语言</value></data>
+  <data name="LanguageChangedRestartTitle" xml:space="preserve"><value>需要重启</value></data>
+  <data name="LanguageChangedRestartMessage" xml:space="preserve"><value>界面语言已更改，请重启应用以使更改完整生效。</value></data>
+</root>

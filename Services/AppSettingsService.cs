@@ -52,6 +52,8 @@ public sealed class AppSettingsService
     {
         settings.FontSize = Math.Clamp(settings.FontSize, 16, 72);
         settings.BackgroundOpacity = Math.Clamp(settings.BackgroundOpacity, 0.15, 0.9);
+        settings.Language = NormalizeLanguage(settings.Language);
+        settings.TargetLanguage = NormalizeTargetLanguage(settings.TargetLanguage);
         settings.AsrProvider = NormalizeAsrProvider(settings.AsrProvider);
         settings.LlmProvider = NormalizeLlmProvider(settings.LlmProvider);
         if (string.IsNullOrWhiteSpace(settings.LlmApiKey) && !string.IsNullOrWhiteSpace(settings.DeepSeekApiKey))
@@ -105,6 +107,36 @@ public sealed class AppSettingsService
 
         var normalized = model.Trim().ToLowerInvariant();
         return normalized is "tiny" or "base" or "small" ? normalized : "tiny";
+    }
+
+    private static string NormalizeLanguage(string language)
+    {
+        if (string.IsNullOrWhiteSpace(language))
+        {
+            return "zh-CN";
+        }
+
+        var normalized = language.Trim();
+        return normalized.Equals("en", StringComparison.OrdinalIgnoreCase) ||
+               normalized.Equals("en-US", StringComparison.OrdinalIgnoreCase)
+            ? "en"
+            : "zh-CN";
+    }
+
+    private static readonly HashSet<string> ValidTargetLanguages = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "zh-CN", "zh-TW", "en", "ja", "ko", "fr", "de", "es", "pt", "ru", "ar", "th", "vi"
+    };
+
+    private static string NormalizeTargetLanguage(string language)
+    {
+        if (string.IsNullOrWhiteSpace(language))
+        {
+            return "zh-CN";
+        }
+
+        var normalized = language.Trim();
+        return ValidTargetLanguages.Contains(normalized) ? normalized : "zh-CN";
     }
 
     private static string NormalizeAsrProvider(string provider)

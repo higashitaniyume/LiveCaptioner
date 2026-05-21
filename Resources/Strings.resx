@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppStartingCaption" xml:space="preserve"><value>LiveCaptioner is starting...</value></data>
+  <data name="ApiKey" xml:space="preserve"><value>API Key</value></data>
+  <data name="ApiUrlBaseUrl" xml:space="preserve"><value>API URL / Base URL</value></data>
+  <data name="Appearance" xml:space="preserve"><value>Appearance</value></data>
+  <data name="AsrBackendSavedRequiresRestart" xml:space="preserve"><value>ASR backend saved. Restart the app to fully switch the loaded Whisper runtime.</value></data>
+  <data name="AsrFailed" xml:space="preserve"><value>ASR recognition failed: {0}</value></data>
+  <data name="AsrReady" xml:space="preserve"><value>Local Whisper ASR is ready</value></data>
+  <data name="AsrRuntime" xml:space="preserve"><value>Whisper runtime: {0}</value></data>
+  <data name="AsrServiceStopped" xml:space="preserve"><value>ASR service stopped: {0}</value></data>
+  <data name="AsrProviderSwitched" xml:space="preserve"><value>Recognition provider switched to {0}</value></data>
+  <data name="AssemblyAiConnected" xml:space="preserve"><value>AssemblyAI streaming connected: {0}</value></data>
+  <data name="AssemblyAiClosed" xml:space="preserve"><value>AssemblyAI connection closed: {0}</value></data>
+  <data name="AssemblyAiMissingKey" xml:space="preserve"><value>AssemblyAI API Key is not configured, online recognition cannot start</value></data>
+  <data name="AssemblyAiParseFailed" xml:space="preserve"><value>Failed to parse AssemblyAI response: {0}</value></data>
+  <data name="AssemblyAiSessionEnded" xml:space="preserve"><value>AssemblyAI session ended</value></data>
+  <data name="AssemblyAiSessionStarted" xml:space="preserve"><value>AssemblyAI session started: {0}</value></data>
+  <data name="AssemblyAiStopFailed" xml:space="preserve"><value>Failed to stop AssemblyAI: {0}</value></data>
+  <data name="AudioBufferNotInitialized" xml:space="preserve"><value>Audio buffer has not been initialized.</value></data>
+  <data name="AudioCaptureInterrupted" xml:space="preserve"><value>Audio capture interrupted: {0}</value></data>
+  <data name="AudioCaptureStarted" xml:space="preserve"><value>System audio capture started: {0}</value></data>
+  <data name="AudioCaptureStopped" xml:space="preserve"><value>System audio capture stopped</value></data>
+  <data name="AudioResampleFailed" xml:space="preserve"><value>Audio resampling failed: {0}</value></data>
+  <data name="AutoTranslate" xml:space="preserve"><value>Auto polish / translate</value></data>
+  <data name="AzureConnected" xml:space="preserve"><value>Azure Speech streaming connected: {0}</value></data>
+  <data name="AzureMissingConfig" xml:space="preserve"><value>Azure Speech Key or Region is not configured, Microsoft online recognition cannot start</value></data>
+  <data name="AzureSessionEnded" xml:space="preserve"><value>Azure Speech session ended</value></data>
+  <data name="AzureSpeechCancelled" xml:space="preserve"><value>Azure Speech canceled: {0} {1}</value></data>
+  <data name="BackgroundOpacity" xml:space="preserve"><value>Background opacity</value></data>
+  <data name="Backend" xml:space="preserve"><value>Backend</value></data>
+  <data name="BilingualComparison" xml:space="preserve"><value>Real-time bilingual comparison</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="ClickThrough" xml:space="preserve"><value>Mouse click-through</value></data>
+  <data name="ClickThroughBalloonText" xml:space="preserve"><value>Press Ctrl+Alt+C or double-click the tray icon to restore interaction.</value></data>
+  <data name="ClickThroughBalloonTitle" xml:space="preserve"><value>LiveCaptioner click-through enabled</value></data>
+  <data name="ClickThroughDisabled" xml:space="preserve"><value>Mouse click-through disabled</value></data>
+  <data name="ClickThroughEnableCountdown" xml:space="preserve"><value>Mouse click-through will turn on in {0} seconds; use Ctrl+Alt+C or the tray menu to restore interaction</value></data>
+  <data name="ClickThroughEnabled" xml:space="preserve"><value>Mouse click-through enabled. Restore interaction with Ctrl+Alt+C or by double-clicking the tray icon.</value></data>
+  <data name="ClickThroughToolTip" xml:space="preserve"><value>After enabling, use Ctrl+Alt+C or the tray menu to restore interaction</value></data>
+  <data name="Close" xml:space="preserve"><value>Close</value></data>
+  <data name="ClaudeRequestFailed" xml:space="preserve"><value>Claude request failed: {0} {1}</value></data>
+  <data name="ConversationDisplayName" xml:space="preserve"><value>Conversation {0:MM-dd HH:mm:ss}</value></data>
+  <data name="CustomStt" xml:space="preserve"><value>Custom STT</value></data>
+  <data name="CustomSttUnsupported" xml:space="preserve"><value>Custom STT WebSocket configuration is reserved; protocol adapter is not implemented in this version.</value></data>
+  <data name="DeepSeekJsonParseFailed" xml:space="preserve"><value>DeepSeek response is not JSON; showing returned text</value></data>
+  <data name="DeepSeekMissingKey" xml:space="preserve"><value>DeepSeek API Key is not configured; showing raw transcript</value></data>
+  <data name="DeepSeekRequestFailed" xml:space="preserve"><value>DeepSeek request failed: {0} {1}</value></data>
+  <data name="DeepSeekUnavailable" xml:space="preserve"><value>DeepSeek is unavailable: {0}</value></data>
+  <data name="DownloadingWhisperModel" xml:space="preserve"><value>Downloading Whisper {0} model. First launch may take a few minutes</value></data>
+  <data name="Exit" xml:space="preserve"><value>Exit</value></data>
+  <data name="FontSize" xml:space="preserve"><value>Font size</value></data>
+  <data name="General" xml:space="preserve"><value>General</value></data>
+  <data name="GoogleConnected" xml:space="preserve"><value>Google Speech streaming connected: {0}</value></data>
+  <data name="GoogleCredentialsPath" xml:space="preserve"><value>Service account JSON path</value></data>
+  <data name="GpuBackendFallback" xml:space="preserve"><value>GPU backend initialization failed, falling back to CPU: {0}</value></data>
+  <data name="History" xml:space="preserve"><value>History</value></data>
+  <data name="HotKeyRegistrationFailed" xml:space="preserve"><value>Failed to register global hotkey Ctrl+Alt+C; it may already be in use</value></data>
+  <data name="Language" xml:space="preserve"><value>Language</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="LanguageRestartRequired" xml:space="preserve"><value>Language saved. Restart the app to apply it everywhere.</value></data>
+  <data name="LanguageSimplifiedChinese" xml:space="preserve"><value>Simplified Chinese</value></data>
+  <data name="LoadInlineHistoryFailed" xml:space="preserve"><value>Failed to load main-page history: {0}</value></data>
+  <data name="LlmJsonParseFailed" xml:space="preserve"><value>LLM response is not JSON; showing returned text</value></data>
+  <data name="LlmMissingKey" xml:space="preserve"><value>LLM API Key is not configured; showing raw transcript</value></data>
+  <data name="LlmModel" xml:space="preserve"><value>LLM model</value></data>
+  <data name="LlmRequestFailed" xml:space="preserve"><value>LLM request failed: {0} {1}</value></data>
+  <data name="LlmSystemPrompt" xml:space="preserve"><value>You are a high-precision real-time bilingual caption assistant. Process rough ASR text by:
+1. Correcting homophones and obvious ASR errors;
+2. Adding punctuation naturally according to tone;
+3. Preserving the original language and outputting corrected source text;
+4. Outputting the corresponding {TargetLanguage} translation; if the source text is already in {TargetLanguage}, output the same corrected sentence in the translation field.
+Strictly output JSON only. Do not use Markdown or explanations. Format:
+{"corrected_text":"corrected source text","translated_text":"{TargetLanguage} translation"}</value></data>
+  <data name="LlmUnavailable" xml:space="preserve"><value>LLM is unavailable: {0}</value></data>
+  <data name="LocalWhisper" xml:space="preserve"><value>Local Whisper</value></data>
+  <data name="Model" xml:space="preserve"><value>Model</value></data>
+  <data name="MissingConversationHistory" xml:space="preserve"><value>The specified conversation history could not be found.</value></data>
+  <data name="NewConversation" xml:space="preserve"><value>New conversation</value></data>
+  <data name="NewConversationCaption" xml:space="preserve"><value>Started a new conversation</value></data>
+  <data name="NewConversationStatus" xml:space="preserve"><value>New conversation: {0}</value></data>
+  <data name="Provider" xml:space="preserve"><value>Provider</value></data>
+  <data name="ReadHistoryFailed" xml:space="preserve"><value>Failed to read history: {0}</value></data>
+  <data name="RecognitionMethod" xml:space="preserve"><value>Recognition method</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Region" xml:space="preserve"><value>Region</value></data>
+  <data name="RestoreWindowInteraction" xml:space="preserve"><value>Restore window interaction</value></data>
+  <data name="RestoredByHotkey" xml:space="preserve"><value>Interaction restored with Ctrl+Alt+C</value></data>
+  <data name="RestoredFromTray" xml:space="preserve"><value>Interaction restored from tray</value></data>
+  <data name="RestoredOpenSettings" xml:space="preserve"><value>Interaction restored and settings opened</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
+  <data name="SaveHistory" xml:space="preserve"><value>Save caption history</value></data>
+  <data name="SaveHistoryFailed" xml:space="preserve"><value>Failed to save history: {0}</value></data>
+  <data name="SaveSettingsFailed" xml:space="preserve"><value>Failed to save settings: {0}</value></data>
+  <data name="Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="SettingsSaved" xml:space="preserve"><value>Settings saved</value></data>
+  <data name="SettingsSubtitle" xml:space="preserve"><value>Caption pipeline settings</value></data>
+  <data name="SettingsWindowTitle" xml:space="preserve"><value>LiveCaptioner Settings</value></data>
+  <data name="SpeechKey" xml:space="preserve"><value>Speech Key</value></data>
+  <data name="StartCapture" xml:space="preserve"><value>Start capture</value></data>
+  <data name="StartFailed" xml:space="preserve"><value>Startup failed: {0}</value></data>
+  <data name="StartupFailedCaption" xml:space="preserve"><value>LiveCaptioner failed to start. Please check your audio device and model file.</value></data>
+  <data name="StopCapture" xml:space="preserve"><value>Stop capture</value></data>
+  <data name="SttRecognition" xml:space="preserve"><value>STT recognition</value></data>
+  <data name="SwitchConversationFailed" xml:space="preserve"><value>Failed to switch conversation: {0}</value></data>
+  <data name="SwitchedConversation" xml:space="preserve"><value>Switched to {0}</value></data>
+  <data name="ToggleClickThrough" xml:space="preserve"><value>Toggle mouse click-through</value></data>
+  <data name="TrayText" xml:space="preserve"><value>LiveCaptioner - Ctrl+Alt+C restores interaction</value></data>
+  <data name="WaitingForSpeech" xml:space="preserve"><value>Waiting for recognizable speech</value></data>
+  <data name="WebSocketUrl" xml:space="preserve"><value>WebSocket URL</value></data>
+  <data name="WhisperPrompt" xml:space="preserve"><value>The following is continuous real-time captions from Windows system audio. Keep the context coherent.</value></data>
+  <data name="LanguageLabel" xml:space="preserve"><value>Language</value></data>
+  <data name="TargetLanguage" xml:space="preserve"><value>Target translation language</value></data>
+  <data name="LanguageChangedRestartTitle" xml:space="preserve"><value>Restart Required</value></data>
+  <data name="LanguageChangedRestartMessage" xml:space="preserve"><value>The interface language has been changed. Please restart the application for the change to take full effect.</value></data>
+</root>

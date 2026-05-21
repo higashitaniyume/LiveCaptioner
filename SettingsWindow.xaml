@@ -1,7 +1,8 @@
 <Window x:Class="LiveCaptioner.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LiveCaptioner 设置"
+        xmlns:loc="clr-namespace:LiveCaptioner.Localization"
+        Title="{loc:Loc SettingsWindowTitle}"
         Width="860"
         Height="640"
         MinWidth="780"
@@ -59,7 +60,8 @@
                                                 BorderThickness="1"
                                                 CornerRadius="6">
                                             <Grid>
-                                                <ContentPresenter Margin="11,0,34,0"
+                                                <ContentPresenter x:Name="ContentSite"
+                                                                  Margin="11,0,34,0"
                                                                   VerticalAlignment="Center"
                                                                   HorizontalAlignment="Left"
                                                                   TextElement.Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"
@@ -112,6 +114,18 @@
                                     </Border>
                                 </Grid>
                             </Popup>
+
+                            <TextBox x:Name="PART_EditableTextBox"
+                                     Margin="11,0,34,0"
+                                     Padding="0"
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Left"
+                                     Background="Transparent"
+                                     Foreground="{TemplateBinding Foreground}"
+                                     BorderThickness="0"
+                                     IsReadOnly="{TemplateBinding IsReadOnly}"
+                                     Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
+                                     Visibility="Hidden" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="HasItems" Value="False">
@@ -119,6 +133,10 @@
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.55" />
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="True">
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="ToggleButton" Property="Visibility" Value="Visible" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -186,7 +204,7 @@
                     <TextBlock Text="LiveCaptioner"
                                FontSize="20"
                                FontWeight="SemiBold" />
-                    <TextBlock Text="字幕管线设置"
+                    <TextBlock Text="{loc:Loc SettingsSubtitle}"
                                Foreground="#7F8B9D"
                                Margin="0,4,0,22" />
                 </StackPanel>
@@ -197,10 +215,10 @@
                          BorderThickness="0"
                          Foreground="#E9EEF6"
                          SelectedIndex="0">
-                    <ListBoxItem Content="通用" Padding="10,9" />
-                    <ListBoxItem Content="STT 识别" Padding="10,9" />
-                    <ListBoxItem Content="LLM 模型" Padding="10,9" />
-                    <ListBoxItem Content="外观" Padding="10,9" />
+                    <ListBoxItem Content="{loc:Loc General}" Padding="10,9" />
+                    <ListBoxItem Content="{loc:Loc SttRecognition}" Padding="10,9" />
+                    <ListBoxItem Content="{loc:Loc LlmModel}" Padding="10,9" />
+                    <ListBoxItem Content="{loc:Loc Appearance}" Padding="10,9" />
                 </ListBox>
             </DockPanel>
         </Border>
@@ -218,14 +236,19 @@
                     <Grid x:Name="GeneralPage">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Text="通用"
+                                <TextBlock Text="{loc:Loc General}"
                                            FontSize="26"
                                            FontWeight="SemiBold"
                                            Margin="0,0,0,20" />
-                                <CheckBox x:Name="AutoTranslateBox" Content="自动润色 / 翻译" />
-                                <CheckBox x:Name="BilingualComparisonBox" Content="实时双语对照" />
-                                <CheckBox x:Name="SaveHistoryBox" Content="保存字幕历史" />
-                                <CheckBox x:Name="ClickThroughBox" Content="鼠标穿透" ToolTip="启用后可用 Ctrl+Alt+C 或托盘菜单恢复交互" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Language}" />
+                                <ComboBox x:Name="LanguageBox" Margin="0,0,0,16">
+                                    <ComboBoxItem Content="{loc:Loc LanguageSimplifiedChinese}" Tag="zh-CN" />
+                                    <ComboBoxItem Content="{loc:Loc LanguageEnglish}" Tag="en" />
+                                </ComboBox>
+                                <CheckBox x:Name="AutoTranslateBox" Content="{loc:Loc AutoTranslate}" />
+                                <CheckBox x:Name="BilingualComparisonBox" Content="{loc:Loc BilingualComparison}" />
+                                <CheckBox x:Name="SaveHistoryBox" Content="{loc:Loc SaveHistory}" />
+                                <CheckBox x:Name="ClickThroughBox" Content="{loc:Loc ClickThrough}" ToolTip="{loc:Loc ClickThroughToolTip}" />
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>
@@ -233,12 +256,12 @@
                     <Grid x:Name="SttPage" Visibility="Collapsed">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Text="STT 识别"
+                                <TextBlock Text="{loc:Loc SttRecognition}"
                                            FontSize="26"
                                            FontWeight="SemiBold"
                                            Margin="0,0,0,20" />
 
-                                <TextBlock Style="{StaticResource LabelText}" Text="识别方式" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc RecognitionMethod}" />
                                 <ComboBox x:Name="AsrProviderBox" Margin="0,0,0,16">
                                     <ComboBoxItem Content="assemblyai" />
                                     <ComboBoxItem Content="azure" />
@@ -248,33 +271,33 @@
                                 </ComboBox>
 
                                 <TextBlock Text="AssemblyAI" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="API Key" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiKey}" />
                                 <PasswordBox x:Name="AssemblyAiKeyBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="模型" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Model}" />
                                 <TextBox x:Name="AssemblyAiModelBox" Margin="0,0,0,18" />
 
                                 <TextBlock Text="Azure Speech" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="Speech Key" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc SpeechKey}" />
                                 <PasswordBox x:Name="AzureSpeechKeyBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="Region" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Region}" />
                                 <TextBox x:Name="AzureSpeechRegionBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="语言" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Language}" />
                                 <TextBox x:Name="AzureSpeechLanguageBox" Margin="0,0,0,18" />
 
                                 <TextBlock Text="Google Speech" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="服务账号 JSON 路径" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc GoogleCredentialsPath}" />
                                 <TextBox x:Name="GoogleCredentialsPathBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="语言" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Language}" />
                                 <TextBox x:Name="GoogleSpeechLanguageBox" Margin="0,0,0,18" />
 
-                                <TextBlock Text="本地 Whisper" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="模型" />
+                                <TextBlock Text="{loc:Loc LocalWhisper}" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,12" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Model}" />
                                 <ComboBox x:Name="WhisperModelBox" Margin="0,0,0,12">
                                     <ComboBoxItem Content="tiny" />
                                     <ComboBoxItem Content="base" />
                                     <ComboBoxItem Content="small" />
                                 </ComboBox>
-                                <TextBlock Style="{StaticResource LabelText}" Text="后端" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Backend}" />
                                 <ComboBox x:Name="AsrBackendBox" Margin="0,0,0,18">
                                     <ComboBoxItem Content="auto" />
                                     <ComboBoxItem Content="cuda" />
@@ -282,10 +305,10 @@
                                     <ComboBoxItem Content="cpu" />
                                 </ComboBox>
 
-                                <TextBlock Text="自定义 STT" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="WebSocket URL" />
+                                <TextBlock Text="{loc:Loc CustomStt}" FontSize="16" FontWeight="SemiBold" Margin="0,8,0,12" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc WebSocketUrl}" />
                                 <TextBox x:Name="CustomSttUrlBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="API Key" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiKey}" />
                                 <PasswordBox x:Name="CustomSttApiKeyBox" />
                             </StackPanel>
                         </ScrollViewer>
@@ -294,41 +317,57 @@
                     <Grid x:Name="LlmPage" Visibility="Collapsed">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Text="LLM 模型"
+                                <TextBlock Text="{loc:Loc LlmModel}"
                                            FontSize="26"
                                            FontWeight="SemiBold"
                                            Margin="0,0,0,20" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="提供商" />
-                                <ComboBox x:Name="LlmProviderBox" Margin="0,0,0,12">
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Provider}" />
+                                <ComboBox x:Name="LlmProviderBox" Margin="0,0,0,12" SelectionChanged="LlmProviderBox_SelectionChanged">
                                     <ComboBoxItem Content="deepseek" />
                                     <ComboBoxItem Content="openai" />
                                     <ComboBoxItem Content="claude" />
                                     <ComboBoxItem Content="custom-openai" />
                                 </ComboBox>
-                                <TextBlock Style="{StaticResource LabelText}" Text="API Key" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiKey}" />
                                 <PasswordBox x:Name="LlmApiKeyBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="API URL / Base URL" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiUrlBaseUrl}" />
                                 <TextBox x:Name="LlmBaseUrlBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="模型" />
-                                <TextBox x:Name="LlmModelBox" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Model}" />
+                                <ComboBox x:Name="LlmModelBox" IsEditable="True" Margin="0,0,0,12" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc TargetLanguage}" />
+                                <ComboBox x:Name="TargetLanguageBox">
+                                    <ComboBoxItem Content="简体中文" Tag="zh-CN" />
+                                    <ComboBoxItem Content="繁體中文" Tag="zh-TW" />
+                                    <ComboBoxItem Content="English" Tag="en" />
+                                    <ComboBoxItem Content="日本語" Tag="ja" />
+                                    <ComboBoxItem Content="한국어" Tag="ko" />
+                                    <ComboBoxItem Content="Français" Tag="fr" />
+                                    <ComboBoxItem Content="Deutsch" Tag="de" />
+                                    <ComboBoxItem Content="Español" Tag="es" />
+                                    <ComboBoxItem Content="Português" Tag="pt" />
+                                    <ComboBoxItem Content="Русский" Tag="ru" />
+                                    <ComboBoxItem Content="العربية" Tag="ar" />
+                                    <ComboBoxItem Content="ไทย" Tag="th" />
+                                    <ComboBoxItem Content="Tiếng Việt" Tag="vi" />
+                                </ComboBox>
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>
 
                     <Grid x:Name="AppearancePage" Visibility="Collapsed">
                         <StackPanel>
-                            <TextBlock Text="外观"
+                            <TextBlock Text="{loc:Loc Appearance}"
                                        FontSize="26"
                                        FontWeight="SemiBold"
                                        Margin="0,0,0,20" />
-                            <TextBlock Style="{StaticResource LabelText}" Text="字体大小" />
+                            <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc FontSize}" />
                             <Slider x:Name="FontSizeSlider"
                                     Minimum="16"
                                     Maximum="72"
                                     TickFrequency="1"
                                     IsSnapToTickEnabled="True"
                                     Margin="0,0,0,22" />
-                            <TextBlock Style="{StaticResource LabelText}" Text="背景透明度" />
+                            <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc BackgroundOpacity}" />
                             <Slider x:Name="OpacitySlider"
                                     Minimum="0.15"
                                     Maximum="0.9"
@@ -344,8 +383,8 @@
                     BorderThickness="0,1,0,0"
                     Background="#151922">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="取消" Margin="0,0,10,0" Click="CancelButton_Click" />
-                    <Button Content="保存" Click="SaveButton_Click" />
+                    <Button Content="{loc:Loc Cancel}" Margin="0,0,10,0" Click="CancelButton_Click" />
+                    <Button Content="{loc:Loc Save}" Click="SaveButton_Click" />
                 </StackPanel>
             </Border>
         </Grid>
