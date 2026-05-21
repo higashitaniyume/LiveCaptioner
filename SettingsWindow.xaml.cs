@@ -37,12 +37,19 @@ public partial class SettingsWindow : Window
     private void LoadSettings()
     {
         SelectLanguage(Settings.Language);
+
+        // Translation page
+        SelectComboByTag(TranslationProviderBox, Settings.TranslationProvider);
+        ApplyTranslationProviderPanels(Settings.TranslationProvider);
+        SelectTargetLanguage(Settings.TargetLanguage);
         SelectCombo(LlmProviderBox, Settings.LlmProvider);
         LlmApiKeyBox.Password = Settings.LlmApiKey;
         LlmBaseUrlBox.Text = Settings.LlmBaseUrl;
         LlmModelBox.Text = Settings.LlmModel;
-        SelectTargetLanguage(Settings.TargetLanguage);
         PopulateModelSuggestions(Settings.LlmProvider);
+        GoogleTranslateKeyBox.Password = Settings.GoogleTranslateApiKey;
+        MicrosoftTranslatorKeyBox.Password = Settings.MicrosoftTranslatorKey;
+        MicrosoftTranslatorRegionBox.Text = Settings.MicrosoftTranslatorRegion;
 
         SelectCombo(AsrProviderBox, Settings.AsrProvider);
         AssemblyAiKeyBox.Password = Settings.AssemblyAiApiKey;
@@ -61,6 +68,8 @@ public partial class SettingsWindow : Window
         BilingualComparisonBox.IsChecked = Settings.BilingualComparison;
         SaveHistoryBox.IsChecked = Settings.SaveHistory;
         ClickThroughBox.IsChecked = Settings.ClickThrough;
+        MinTextLengthBox.Text = Settings.MinTextLength.ToString();
+        DebounceDelayBox.Text = Settings.DebounceDelayMs.ToString();
         FontSizeSlider.Value = Settings.FontSize;
         OpacitySlider.Value = Settings.BackgroundOpacity;
     }
@@ -78,6 +87,10 @@ public partial class SettingsWindow : Window
         }
 
         Settings.Language = newLanguage;
+
+        // Translation
+        Settings.TranslationProvider = ReadComboByTag(TranslationProviderBox, "llm");
+        Settings.TargetLanguage = ReadTargetLanguage();
         Settings.LlmProvider = ReadCombo(LlmProviderBox, "deepseek");
         Settings.LlmApiKey = LlmApiKeyBox.Password.Trim();
         Settings.LlmBaseUrl = string.IsNullOrWhiteSpace(LlmBaseUrlBox.Text)
@@ -86,7 +99,9 @@ public partial class SettingsWindow : Window
         Settings.LlmModel = string.IsNullOrWhiteSpace(LlmModelBox.Text)
             ? GetDefaultLlmModel(Settings.LlmProvider)
             : LlmModelBox.Text.Trim();
-        Settings.TargetLanguage = ReadTargetLanguage();
+        Settings.GoogleTranslateApiKey = GoogleTranslateKeyBox.Password.Trim();
+        Settings.MicrosoftTranslatorKey = MicrosoftTranslatorKeyBox.Password.Trim();
+        Settings.MicrosoftTranslatorRegion = MicrosoftTranslatorRegionBox.Text.Trim();
         Settings.DeepSeekApiKey = Settings.LlmApiKey;
         Settings.DeepSeekModel = Settings.LlmModel;
 
@@ -113,6 +128,8 @@ public partial class SettingsWindow : Window
         Settings.BilingualComparison = BilingualComparisonBox.IsChecked == true;
         Settings.SaveHistory = SaveHistoryBox.IsChecked == true;
         Settings.ClickThrough = ClickThroughBox.IsChecked == true;
+        Settings.MinTextLength = ReadInt(MinTextLengthBox, 8);
+        Settings.DebounceDelayMs = ReadInt(DebounceDelayBox, 800);
         Settings.FontSize = FontSizeSlider.Value;
         Settings.BackgroundOpacity = OpacitySlider.Value;
 
@@ -127,6 +144,21 @@ public partial class SettingsWindow : Window
     private void NavList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
         ApplySelectedPage();
+    }
+
+    private void TranslationProviderBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        var provider = ReadComboByTag(TranslationProviderBox, "llm");
+        ApplyTranslationProviderPanels(provider);
+    }
+
+    private void ApplyTranslationProviderPanels(string provider)
+    {
+        if (LlmSettingsPanel is null || GoogleSettingsPanel is null || MicrosoftSettingsPanel is null) return;
+
+        LlmSettingsPanel.Visibility = provider == "llm" ? Visibility.Visible : Visibility.Collapsed;
+        GoogleSettingsPanel.Visibility = provider == "google" ? Visibility.Visible : Visibility.Collapsed;
+        MicrosoftSettingsPanel.Visibility = provider == "microsoft" ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void LlmProviderBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -186,6 +218,28 @@ public partial class SettingsWindow : Window
             : fallback;
     }
 
+    private static void SelectComboByTag(System.Windows.Controls.ComboBox comboBox, string tag)
+    {
+        foreach (var item in comboBox.Items.OfType<System.Windows.Controls.ComboBoxItem>())
+        {
+            if (string.Equals(item.Tag?.ToString(), tag, StringComparison.OrdinalIgnoreCase))
+            {
+                comboBox.SelectedItem = item;
+                return;
+            }
+        }
+
+        comboBox.SelectedIndex = 0;
+    }
+
+    private static string ReadComboByTag(System.Windows.Controls.ComboBox comboBox, string fallback)
+    {
+        return comboBox.SelectedItem is System.Windows.Controls.ComboBoxItem item &&
+               item.Tag?.ToString() is { Length: > 0 } value
+            ? value.ToLowerInvariant()
+            : fallback;
+    }
+
     private void SelectLanguage(string language)
     {
         foreach (var item in LanguageBox.Items.OfType<System.Windows.Controls.ComboBoxItem>())
@@ -233,6 +287,11 @@ public partial class SettingsWindow : Window
     private string ReadTargetLanguage()
     {
         return ReadTargetLanguage(TargetLanguageBox);
+    }
+
+    private static int ReadInt(System.Windows.Controls.TextBox textBox, int fallback)
+    {
+        return int.TryParse(textBox.Text.Trim(), out var value) ? value : fallback;
     }
 
     private static string GetDefaultLlmBaseUrl(string provider)

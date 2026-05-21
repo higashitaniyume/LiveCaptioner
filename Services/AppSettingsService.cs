@@ -94,6 +94,14 @@ public sealed class AppSettingsService
             : settings.GoogleSpeechLanguage.Trim();
         settings.CustomSttWebSocketUrl = settings.CustomSttWebSocketUrl.Trim();
         settings.CustomSttApiKey = settings.CustomSttApiKey.Trim();
+        settings.TranslationProvider = NormalizeTranslationProvider(settings.TranslationProvider);
+        settings.GoogleTranslateApiKey = settings.GoogleTranslateApiKey.Trim();
+        settings.MicrosoftTranslatorKey = settings.MicrosoftTranslatorKey.Trim();
+        settings.MicrosoftTranslatorRegion = string.IsNullOrWhiteSpace(settings.MicrosoftTranslatorRegion)
+            ? "global"
+            : settings.MicrosoftTranslatorRegion.Trim();
+        settings.MinTextLength = Math.Clamp(settings.MinTextLength, 1, 200);
+        settings.DebounceDelayMs = Math.Clamp(settings.DebounceDelayMs, 200, 5000);
 
         return settings;
     }
@@ -159,6 +167,17 @@ public sealed class AppSettingsService
 
         var normalized = backend.Trim().ToLowerInvariant();
         return normalized is "auto" or "cuda" or "vulkan" or "cpu" ? normalized : "auto";
+    }
+
+    private static string NormalizeTranslationProvider(string provider)
+    {
+        if (string.IsNullOrWhiteSpace(provider))
+        {
+            return "llm";
+        }
+
+        var normalized = provider.Trim().ToLowerInvariant();
+        return normalized is "llm" or "google" or "microsoft" ? normalized : "llm";
     }
 
     private static string NormalizeLlmProvider(string provider)

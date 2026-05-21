@@ -125,4 +125,15 @@ Strictly output JSON only. Do not use Markdown or explanations. Format:
   <data name="TargetLanguage" xml:space="preserve"><value>Target translation language</value></data>
   <data name="LanguageChangedRestartTitle" xml:space="preserve"><value>Restart Required</value></data>
   <data name="LanguageChangedRestartMessage" xml:space="preserve"><value>The interface language has been changed. Please restart the application for the change to take full effect.</value></data>
+  <data name="Translation" xml:space="preserve"><value>Translation</value></data>
+  <data name="TranslationProvider" xml:space="preserve"><value>Translation provider</value></data>
+  <data name="TranslationProviderLLM" xml:space="preserve"><value>LLM (polish + translate)</value></data>
+  <data name="TranslationProviderGoogle" xml:space="preserve"><value>Google Translate</value></data>
+  <data name="TranslationProviderMicrosoft" xml:space="preserve"><value>Microsoft Translator</value></data>
+  <data name="GoogleTranslateFailed" xml:space="preserve"><value>Google Translate failed: {0}</value></data>
+  <data name="GoogleTranslateMissingKey" xml:space="preserve"><value>Google Translate API key is not configured; showing raw transcript</value></data>
+  <data name="MicrosoftTranslateFailed" xml:space="preserve"><value>Microsoft Translator failed: {0}</value></data>
+  <data name="MicrosoftTranslateMissingKey" xml:space="preserve"><value>Microsoft Translator key is not configured; showing raw transcript</value></data>
+  <data name="MinTextLength" xml:space="preserve"><value>Min text length (chars)</value></data>
+  <data name="DebounceDelayMs" xml:space="preserve"><value>Pause before showing (ms)</value></data>
 </root>

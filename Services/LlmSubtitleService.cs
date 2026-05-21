@@ -27,25 +27,57 @@ public sealed class LlmSubtitleService : IDisposable
         ["vi"] = "Tiếng Việt",
     };
 
+    private static readonly Dictionary<string, string> MicrosoftLanguageCodes = new()
+    {
+        ["zh-CN"] = "zh-Hans",
+        ["zh-TW"] = "zh-Hant",
+        ["en"] = "en",
+        ["ja"] = "ja",
+        ["ko"] = "ko",
+        ["fr"] = "fr",
+        ["de"] = "de",
+        ["es"] = "es",
+        ["pt"] = "pt",
+        ["ru"] = "ru",
+        ["ar"] = "ar",
+        ["th"] = "th",
+        ["vi"] = "vi",
+    };
+
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly HttpClient _httpClient;
-    private readonly TimeSpan _debounceDelay = TimeSpan.FromMilliseconds(350);
     private CancellationTokenSource? _debounceCts;
+    private CancellationTokenSource _llmCts;
+    private int _currentGeneration;
     private bool _disposed;
 
     public LlmSubtitleService(HttpClient? httpClient = null)
     {
         _httpClient = httpClient ?? new HttpClient();
         _httpClient.Timeout = TimeSpan.FromSeconds(25);
+        _llmCts = new CancellationTokenSource();
     }
 
+    // ── LLM settings ──
     public string Provider { get; set; } = "deepseek";
     public string ApiKey { get; set; } = string.Empty;
     public string BaseUrl { get; set; } = "https://api.deepseek.com/v1";
     public string Model { get; set; } = "deepseek-v4-flash";
+
+    // ── Translation settings ──
+    public string TranslationProvider { get; set; } = "llm";
     public string TargetLanguage { get; set; } = "zh-CN";
+    public string GoogleTranslateApiKey { get; set; } = string.Empty;
+    public string MicrosoftTranslatorKey { get; set; } = string.Empty;
+    public string MicrosoftTranslatorRegion { get; set; } = "global";
     public bool AutoTranslate { get; set; } = true;
     public bool BilingualComparison { get; set; } = true;
+
+    // ── Display timing ──
+    public int MinTextLength { get; set; } = 8;
+    public int DebounceDelayMs { get; set; } = 800;
+
+    private TimeSpan DebounceDelay => TimeSpan.FromMilliseconds(DebounceDelayMs);
 
     private string BuildSystemPrompt()
     {
@@ -65,18 +97,39 @@ public sealed class LlmSubtitleService : IDisposable
             return;
         }
 
+        // Reset debounce timer on every incoming text fragment.
         _debounceCts?.Cancel();
         _debounceCts?.Dispose();
         _debounceCts = new CancellationTokenSource();
+        var debounceToken = _debounceCts.Token;
+        var generation = Interlocked.Increment(ref _currentGeneration);
 
-        var token = _debounceCts.Token;
         _ = Task.Run(async () =>
         {
             try
             {
-                await Task.Delay(_debounceDelay, token).ConfigureAwait(false);
-                var subtitle = await TranslateAndPolishAsync(rawText, token).ConfigureAwait(false);
-                SubtitleReady?.Invoke(this, subtitle);
+                // Wait until ASR has been silent for the debounce period.
+                await Task.Delay(DebounceDelay, debounceToken).ConfigureAwait(false);
+
+                var trimmed = rawText.Trim();
+                if (trimmed.Length < MinTextLength)
+                {
+                    return; // Not enough content yet — wait for the next accumulated text.
+                }
+
+                // Show raw text immediately — the utterance is complete.
+                SubtitleReady?.Invoke(this, BilingualSubtitle.Raw(rawText));
+
+                // Start translation without cancelling previous ones.
+                // Each translation runs independently; the generation check
+                // below discards stale results so old translations don't
+                // overwrite newer raw text.
+                var subtitle = await TranslateAndPolishAsync(trimmed, _llmCts.Token).ConfigureAwait(false);
+
+                if (generation == Volatile.Read(ref _currentGeneration))
+                {
+                    SubtitleReady?.Invoke(this, subtitle);
+                }
             }
             catch (OperationCanceledException)
             {
@@ -91,14 +144,25 @@ public sealed class LlmSubtitleService : IDisposable
             return BilingualSubtitle.Raw(rawText);
         }
 
-        if (string.IsNullOrWhiteSpace(ApiKey))
-        {
-            StatusChanged?.Invoke(this, LocalizationManager.T("LlmMissingKey"));
-            return BilingualSubtitle.Raw(rawText);
-        }
-
         try
         {
+            if (string.Equals(TranslationProvider, "google", StringComparison.OrdinalIgnoreCase))
+            {
+                return await TranslateViaGoogleAsync(rawText, cancellationToken).ConfigureAwait(false);
+            }
+
+            if (string.Equals(TranslationProvider, "microsoft", StringComparison.OrdinalIgnoreCase))
+            {
+                return await TranslateViaMicrosoftAsync(rawText, cancellationToken).ConfigureAwait(false);
+            }
+
+            // Default: LLM-based correction + translation.
+            if (string.IsNullOrWhiteSpace(ApiKey))
+            {
+                StatusChanged?.Invoke(this, LocalizationManager.T("LlmMissingKey"));
+                return BilingualSubtitle.Raw(rawText);
+            }
+
             var content = IsClaudeProvider()
                 ? await CallClaudeAsync(rawText, cancellationToken).ConfigureAwait(false)
                 : await CallOpenAiCompatibleAsync(rawText, cancellationToken).ConfigureAwait(false);
@@ -114,6 +178,84 @@ public sealed class LlmSubtitleService : IDisposable
             StatusChanged?.Invoke(this, LocalizationManager.Format("LlmUnavailable", ex.Message));
             return BilingualSubtitle.Raw(rawText);
         }
+    }
+
+    private async Task<BilingualSubtitle> TranslateViaGoogleAsync(string rawText, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(GoogleTranslateApiKey))
+        {
+            StatusChanged?.Invoke(this, LocalizationManager.T("GoogleTranslateMissingKey"));
+            return BilingualSubtitle.Raw(rawText);
+        }
+
+        var url = $"https://translation.googleapis.com/language/translate/v2?key={GoogleTranslateApiKey}";
+        var body = JsonContent.Create(new
+        {
+            q = rawText,
+            target = TargetLanguage,
+            format = "text"
+        }, options: JsonOptions);
+
+        using var response = await _httpClient.PostAsync(url, body, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+        {
+            StatusChanged?.Invoke(this, LocalizationManager.Format("GoogleTranslateFailed", (int)response.StatusCode));
+            return BilingualSubtitle.Raw(rawText);
+        }
+
+        var payload = await response.Content
+            .ReadFromJsonAsync<GoogleTranslateResponse>(JsonOptions, cancellationToken)
+            .ConfigureAwait(false);
+
+        var translated = payload?.Data?.Translations?.FirstOrDefault()?.TranslatedText?.Trim();
+        return new BilingualSubtitle
+        {
+            RawText = rawText.Trim(),
+            CorrectedText = rawText.Trim(),
+            TranslatedText = BilingualComparison && !string.IsNullOrWhiteSpace(translated) ? translated : string.Empty
+        };
+    }
+
+    private async Task<BilingualSubtitle> TranslateViaMicrosoftAsync(string rawText, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(MicrosoftTranslatorKey))
+        {
+            StatusChanged?.Invoke(this, LocalizationManager.T("MicrosoftTranslateMissingKey"));
+            return BilingualSubtitle.Raw(rawText);
+        }
+
+        var targetCode = MicrosoftLanguageCodes.TryGetValue(TargetLanguage, out var code)
+            ? code
+            : TargetLanguage;
+        var region = string.IsNullOrWhiteSpace(MicrosoftTranslatorRegion) ? "global" : MicrosoftTranslatorRegion;
+        var url = $"https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to={targetCode}";
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, url);
+        request.Headers.Add("Ocp-Apim-Subscription-Key", MicrosoftTranslatorKey);
+        request.Headers.Add("Ocp-Apim-Subscription-Region", region);
+        request.Content = JsonContent.Create(new[]
+        {
+            new { Text = rawText }
+        }, options: JsonOptions);
+
+        using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+        {
+            StatusChanged?.Invoke(this, LocalizationManager.Format("MicrosoftTranslateFailed", (int)response.StatusCode));
+            return BilingualSubtitle.Raw(rawText);
+        }
+
+        var payload = await response.Content
+            .ReadFromJsonAsync<MicrosoftTranslateResponse[]>(JsonOptions, cancellationToken)
+            .ConfigureAwait(false);
+
+        var translated = payload?.FirstOrDefault()?.Translations?.FirstOrDefault()?.Text?.Trim();
+        return new BilingualSubtitle
+        {
+            RawText = rawText.Trim(),
+            CorrectedText = rawText.Trim(),
+            TranslatedText = BilingualComparison && !string.IsNullOrWhiteSpace(translated) ? translated : string.Empty
+        };
     }
 
     private async Task<string?> CallOpenAiCompatibleAsync(string rawText, CancellationToken cancellationToken)
@@ -249,6 +391,8 @@ public sealed class LlmSubtitleService : IDisposable
 
         _debounceCts?.Cancel();
         _debounceCts?.Dispose();
+        _llmCts.Cancel();
+        _llmCts.Dispose();
         _httpClient.Dispose();
         _disposed = true;
     }
@@ -293,5 +437,35 @@ public sealed class LlmSubtitleService : IDisposable
 
         [JsonPropertyName("translated_text")]
         public string? TranslatedText { get; set; }
+    }
+
+    private sealed class GoogleTranslateResponse
+    {
+        [JsonPropertyName("data")]
+        public GoogleTranslateData? Data { get; set; }
+    }
+
+    private sealed class GoogleTranslateData
+    {
+        [JsonPropertyName("translations")]
+        public List<GoogleTranslation>? Translations { get; set; }
+    }
+
+    private sealed class GoogleTranslation
+    {
+        [JsonPropertyName("translatedText")]
+        public string? TranslatedText { get; set; }
+    }
+
+    private sealed class MicrosoftTranslateResponse
+    {
+        [JsonPropertyName("translations")]
+        public List<MicrosoftTranslation>? Translations { get; set; }
+    }
+
+    private sealed class MicrosoftTranslation
+    {
+        [JsonPropertyName("text")]
+        public string? Text { get; set; }
     }
 }

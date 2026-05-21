@@ -217,7 +217,7 @@
                          SelectedIndex="0">
                     <ListBoxItem Content="{loc:Loc General}" Padding="10,9" />
                     <ListBoxItem Content="{loc:Loc SttRecognition}" Padding="10,9" />
-                    <ListBoxItem Content="{loc:Loc LlmModel}" Padding="10,9" />
+                    <ListBoxItem Content="{loc:Loc Translation}" Padding="10,9" />
                     <ListBoxItem Content="{loc:Loc Appearance}" Padding="10,9" />
                 </ListBox>
             </DockPanel>
@@ -249,6 +249,10 @@
                                 <CheckBox x:Name="BilingualComparisonBox" Content="{loc:Loc BilingualComparison}" />
                                 <CheckBox x:Name="SaveHistoryBox" Content="{loc:Loc SaveHistory}" />
                                 <CheckBox x:Name="ClickThroughBox" Content="{loc:Loc ClickThrough}" ToolTip="{loc:Loc ClickThroughToolTip}" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc MinTextLength}" Margin="0,12,0,6" />
+                                <TextBox x:Name="MinTextLengthBox" Margin="0,0,0,12" Width="120" HorizontalAlignment="Left" />
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc DebounceDelayMs}" />
+                                <TextBox x:Name="DebounceDelayBox" Margin="0,0,0,12" Width="120" HorizontalAlignment="Left" />
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>
@@ -317,25 +321,21 @@
                     <Grid x:Name="LlmPage" Visibility="Collapsed">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Text="{loc:Loc LlmModel}"
+                                <TextBlock Text="{loc:Loc Translation}"
                                            FontSize="26"
                                            FontWeight="SemiBold"
                                            Margin="0,0,0,20" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Provider}" />
-                                <ComboBox x:Name="LlmProviderBox" Margin="0,0,0,12" SelectionChanged="LlmProviderBox_SelectionChanged">
-                                    <ComboBoxItem Content="deepseek" />
-                                    <ComboBoxItem Content="openai" />
-                                    <ComboBoxItem Content="claude" />
-                                    <ComboBoxItem Content="custom-openai" />
+
+                                <!-- ── Shared: translation provider + target language ── -->
+                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc TranslationProvider}" />
+                                <ComboBox x:Name="TranslationProviderBox" Margin="0,0,0,12" SelectionChanged="TranslationProviderBox_SelectionChanged">
+                                    <ComboBoxItem Content="{loc:Loc TranslationProviderLLM}" Tag="llm" />
+                                    <ComboBoxItem Content="{loc:Loc TranslationProviderGoogle}" Tag="google" />
+                                    <ComboBoxItem Content="{loc:Loc TranslationProviderMicrosoft}" Tag="microsoft" />
                                 </ComboBox>
-                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiKey}" />
-                                <PasswordBox x:Name="LlmApiKeyBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiUrlBaseUrl}" />
-                                <TextBox x:Name="LlmBaseUrlBox" Margin="0,0,0,12" />
-                                <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Model}" />
-                                <ComboBox x:Name="LlmModelBox" IsEditable="True" Margin="0,0,0,12" />
+
                                 <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc TargetLanguage}" />
-                                <ComboBox x:Name="TargetLanguageBox">
+                                <ComboBox x:Name="TargetLanguageBox" Margin="0,0,0,16">
                                     <ComboBoxItem Content="简体中文" Tag="zh-CN" />
                                     <ComboBoxItem Content="繁體中文" Tag="zh-TW" />
                                     <ComboBoxItem Content="English" Tag="en" />
@@ -350,6 +350,37 @@
                                     <ComboBoxItem Content="ไทย" Tag="th" />
                                     <ComboBoxItem Content="Tiếng Việt" Tag="vi" />
                                 </ComboBox>
+
+                                <!-- ── LLM-specific settings ── -->
+                                <StackPanel x:Name="LlmSettingsPanel">
+                                    <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Provider}" />
+                                    <ComboBox x:Name="LlmProviderBox" Margin="0,0,0,12" SelectionChanged="LlmProviderBox_SelectionChanged">
+                                        <ComboBoxItem Content="deepseek" />
+                                        <ComboBoxItem Content="openai" />
+                                        <ComboBoxItem Content="claude" />
+                                        <ComboBoxItem Content="custom-openai" />
+                                    </ComboBox>
+                                    <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiKey}" />
+                                    <PasswordBox x:Name="LlmApiKeyBox" Margin="0,0,0,12" />
+                                    <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiUrlBaseUrl}" />
+                                    <TextBox x:Name="LlmBaseUrlBox" Margin="0,0,0,12" />
+                                    <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Model}" />
+                                    <ComboBox x:Name="LlmModelBox" IsEditable="True" Margin="0,0,0,12" />
+                                </StackPanel>
+
+                                <!-- ── Google-specific settings ── -->
+                                <StackPanel x:Name="GoogleSettingsPanel" Visibility="Collapsed">
+                                    <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiKey}" />
+                                    <PasswordBox x:Name="GoogleTranslateKeyBox" Margin="0,0,0,12" />
+                                </StackPanel>
+
+                                <!-- ── Microsoft-specific settings ── -->
+                                <StackPanel x:Name="MicrosoftSettingsPanel" Visibility="Collapsed">
+                                    <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc ApiKey}" />
+                                    <PasswordBox x:Name="MicrosoftTranslatorKeyBox" Margin="0,0,0,12" />
+                                    <TextBlock Style="{StaticResource LabelText}" Text="{loc:Loc Region}" />
+                                    <TextBox x:Name="MicrosoftTranslatorRegionBox" Margin="0,0,0,12" />
+                                </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>

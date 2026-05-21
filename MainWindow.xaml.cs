@@ -64,7 +64,13 @@ public partial class MainWindow : Window
             AutoTranslate = _settings.AutoTranslate,
             BilingualComparison = _settings.BilingualComparison,
             Model = _settings.LlmModel,
-            TargetLanguage = _settings.TargetLanguage
+            TargetLanguage = _settings.TargetLanguage,
+            TranslationProvider = _settings.TranslationProvider,
+            GoogleTranslateApiKey = _settings.GoogleTranslateApiKey,
+            MicrosoftTranslatorKey = _settings.MicrosoftTranslatorKey,
+            MicrosoftTranslatorRegion = _settings.MicrosoftTranslatorRegion,
+            MinTextLength = _settings.MinTextLength,
+            DebounceDelayMs = _settings.DebounceDelayMs
         };
         _inlineHistoryItems.Clear();
         await RefreshConversationListAsync(selectCurrent: true);
@@ -406,6 +412,12 @@ public partial class MainWindow : Window
             _llmService.BilingualComparison = _settings.BilingualComparison;
             _llmService.Model = _settings.LlmModel;
             _llmService.TargetLanguage = _settings.TargetLanguage;
+            _llmService.TranslationProvider = _settings.TranslationProvider;
+            _llmService.GoogleTranslateApiKey = _settings.GoogleTranslateApiKey;
+            _llmService.MicrosoftTranslatorKey = _settings.MicrosoftTranslatorKey;
+            _llmService.MicrosoftTranslatorRegion = _settings.MicrosoftTranslatorRegion;
+            _llmService.MinTextLength = _settings.MinTextLength;
+            _llmService.DebounceDelayMs = _settings.DebounceDelayMs;
         }
 
         ApplyVisualSettings();

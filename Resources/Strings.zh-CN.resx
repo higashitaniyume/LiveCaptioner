@@ -125,4 +125,15 @@
   <data name="TargetLanguage" xml:space="preserve"><value>翻译目标语言</value></data>
   <data name="LanguageChangedRestartTitle" xml:space="preserve"><value>需要重启</value></data>
   <data name="LanguageChangedRestartMessage" xml:space="preserve"><value>界面语言已更改，请重启应用以使更改完整生效。</value></data>
+  <data name="Translation" xml:space="preserve"><value>翻译</value></data>
+  <data name="TranslationProvider" xml:space="preserve"><value>翻译提供商</value></data>
+  <data name="TranslationProviderLLM" xml:space="preserve"><value>LLM（润色+翻译）</value></data>
+  <data name="TranslationProviderGoogle" xml:space="preserve"><value>Google 翻译</value></data>
+  <data name="TranslationProviderMicrosoft" xml:space="preserve"><value>微软翻译</value></data>
+  <data name="GoogleTranslateFailed" xml:space="preserve"><value>Google 翻译失败：{0}</value></data>
+  <data name="GoogleTranslateMissingKey" xml:space="preserve"><value>未配置 Google 翻译 API Key，显示原始识别文本</value></data>
+  <data name="MicrosoftTranslateFailed" xml:space="preserve"><value>微软翻译失败：{0}</value></data>
+  <data name="MicrosoftTranslateMissingKey" xml:space="preserve"><value>未配置微软翻译 Key，显示原始识别文本</value></data>
+  <data name="MinTextLength" xml:space="preserve"><value>最小文本长度（字符）</value></data>
+  <data name="DebounceDelayMs" xml:space="preserve"><value>停顿等待时间（毫秒）</value></data>
 </root>
