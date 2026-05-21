@@ -1,0 +1,5 @@
+namespace LiveCaptioner;
+
+public partial class App : System.Windows.Application
+{
+}
